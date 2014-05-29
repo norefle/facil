@@ -16,6 +16,98 @@ local function unwrap(origin)
     return origin
 end
 
+--- Creates mocks for lfs, uuid and io
+-- @param backup Table for backup savings.
+-- @param lfs Origin table for lfs module.
+-- @param uuid Origin table for uuid module.
+-- @param io Origin table for io module.
+local function createMocks(backup, lfs, uuid, io)
+    backup = backup or {}
+    backup.lfs = {}
+    backup.uuid = {}
+    backup.io = {}
+
+    if lfs then
+        lfs = mock(lfs, true)
+
+        backup.lfs.mkdir = lfs.mkdir
+        lfs.mkdir = function(...)
+            backup.lfs.mkdir(...)
+            return true
+        end
+
+        backup.lfs.currentdir = lfs.currentdir
+        lfs.currentdir = function(...)
+            backup.lfs.currentdir(...)
+            return "/xyz"
+        end
+    end
+
+    if uuid then
+        uuid = mock(uuid, true)
+
+        backup.uuid.new = uuid.new
+        uuid.new = function(...)
+            backup.uuid.new(...)
+            return "aaaa-bbbb-cccc-dddd"
+        end
+    end
+
+    if io then
+        io = mock(io, true)
+
+        backup.io.open = io.open
+        io.open = function(...)
+            backup.io.open(...)
+            return {
+                read = function(...) return "file:data" end,
+                close = function(...) return true end
+            }
+        end
+    end
+end
+
+--- Restores backup made by createMocks.
+-- @param backup Table with backup savings.
+-- @param lfs Mock table of lfs module.
+-- @param uuid Mock table of uuid module.
+-- @param io Mock table of io module.
+local function restoreBackup(backup, lfs, uuid, io)
+    if io then
+        io.open = backup.io.open
+    end
+
+    if uuid then
+        uuid.new = backup.uuid.new
+    end
+
+    if lfs then
+        lfs.mkdir = backup.lfs.mkdir
+        lfs.currentdir = backup.lfs.currentdir
+    end
+end
+
+
+--- Reverts changes made by createMocks.
+-- @param backup Table with backup savings.
+-- @param lfs Mock table of lfs module.
+-- @param uuid Mock table of uuid module.
+-- @param io Mock table of io module.
+local function revertMocks(backup, lfs, uuid, io)
+    restoreBackup(backup, lfs, uuid, io)
+    if io then
+        io = unwrap(io)
+    end
+
+    if uuid then
+        uuid = unwrap(uuid)
+    end
+
+    if lfs then
+        lfs = unwrap(lfs)
+    end
+end
+
 describe("fácil's create command", function()
     local fl -- Core module of fácil.
     local uuid -- uuid library.
@@ -51,41 +143,22 @@ describe("fácil's create command", function()
     end)
 
     it("returns error on invalid file creation", function()
+        local backup = {}
+        createMocks(backup, lfs, uuid)
         io = mock(io, true)
-        lfs = mock(lfs, true)
-
-        local origin = {}
-        origin.currentdir = lfs.currentdir
-        origin.mkdir = lfs.mkdir
-
-        lfs.currentdir = function() return "/home/fl" end
-        lfs.mkdir = function() return true end
 
         local result, details = fl.create("name")
         assert.is.equal(result, nil)
         assert.is.equal(details:find("Can't create file: "), 1)
 
-        lfs.currentdir = origin.currentdir
-        lfs.mkdir = origin.mkdir
-
-        lfs = unwrap(lfs)
         io = unwrap(io)
+        revertMocks(backup, lfs, uuid)
     end)
 
     it("creates card and meta with valid names", function()
+        local backup = {}
+        createMocks(backup, lfs, uuid)
         io = mock(io, true)
-        lfs = mock(lfs, true)
-
-        local origin = {}
-
-        origin.new = uuid.new
-        uuid.new = function() return "aaa-bbb-ccc-ddd" end
-
-        origin.currentdir = lfs.currentdir
-        lfs.currentdir = function() return "/xyz" end
-
-        origin.mkdir = lfs.mkdir
-        lfs.mkdir = function() return true end
 
         local result, details = fl.create("new card")
         -- Stub will return nil on io.open always,
@@ -95,51 +168,38 @@ describe("fácil's create command", function()
 
         -- Check that stub was called with correct arguments.
         assert.stub(io.open).was.called(1)
-        assert.stub(io.open).was.called_with("/xyz/.fl/cards/aa/a-bbb-ccc-ddd.md", "w")
+        assert.stub(io.open).was.called_with("/xyz/.fl/cards/aa/aa-bbbb-cccc-dddd.md", "w")
 
-        lfs.mkdir = origin.mkdir
-        lfs.currentdir = origin.currentdir
-        uuid.new = origin.new
-
-        lfs = unwrap(lfs)
         io = unwrap(io)
+        revertMocks(backup, lfs, uuid)
     end)
 
     it("returns error if didn't get current directory", function()
+        io = mock(io, true)
         lfs = mock(lfs, true)
 
         local result, description = fl.create("wrong")
         assert.is.equal(result, nil)
         assert.is.equal("Can't generate file name for card.", description)
 
-        unwrap(lfs)
+        lfs = unwrap(lfs)
+        io = unwrap(io)
     end)
 
     it("creates required directories", function()
-        lfs = mock(lfs, true)
+        local backup = {}
+        createMocks(backup, lfs, uuid)
+        io = mock(io, true)
 
-        local origin = {
-            currentdir = lfs.currentdir,
-            mkdir = lfs.mkdir,
-            new = uuid.new
-        }
+        fl.create("task #1")
 
-        lfs.currentdir = function() return "/home/facil" end
-        lfs.mkdir = function(...)
-            origin.mkdir(...)
-            return true
-        end
-        uuid.new = function() return "1234-5678-9abc-ef01" end
-
-        local result, description = fl.create("task #1")
-
-        lfs.mkdir = origin.mkdir
+        -- Restore stub from backup to be able to call was.called
+        restoreBackup(backup, lfs)
 
         assert.stub(lfs.mkdir).was.called(1)
-        assert.stub(lfs.mkdir).was.called_with("/home/facil/.fl/cards/12/")
+        assert.stub(lfs.mkdir).was.called_with("/xyz/.fl/cards/aa/")
 
-        uuid.new = origin.new
-        lfs.currentdir = origin.currentdir
-        unwrap(lfs)
+        io = unwrap(io)
+        revertMocks(backup, lfs, uuid)
     end)
 end)
