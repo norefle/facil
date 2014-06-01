@@ -1,6 +1,6 @@
 --[[----------------------------------------------------------------------------
---- @file init.lua
---- @brief Entry point of fácil module.
+--- @file core.lua
+--- @brief Core component of fácil.
 ----------------------------------------------------------------------------]]--
 
 local FileSystem = require "lfs"
@@ -126,11 +126,5 @@ function _M.create(name)
 
     return true
 end
-
---- Current version.
-_M.VERSION = "0.0.1"
-
---- Official name of fácil.
-_M.NAME = "fácil"
 
 return _M

@@ -4,6 +4,7 @@
 ----------------------------------------------------------------------------]]--
 
 local Options = require "cliargs"
+local Fl = require "facil"
 
 --- Name of fácil.
 local FACIL_NAME="fácil"
