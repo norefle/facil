@@ -72,6 +72,11 @@ function _M.create(name)
     markdown.file:write(Template.Md.value)
     markdown.file:close()
 
+    --- @warning Platform (linux specific) dependent code.
+    --- @todo Either replace with something more cross platform
+    ---       or check OS before.
+    os.execute("$EDITOR " .. markdown.name)
+
     return true
 end
 

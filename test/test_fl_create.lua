@@ -7,6 +7,10 @@
 -- @param origin Table previously wrapped with mock() function.
 -- @return Table with removed stub wrappers.
 local function unwrap(origin)
+    if not origin or "table" ~= type(origin) then
+        return origin
+    end
+
     for _, value in pairs(origin) do
         if "table" == type(value) and "function" == type(value.revert) then
             value:revert()
@@ -17,12 +21,13 @@ local function unwrap(origin)
 end
 
 --- Creates mocks for lfs, uuid and io
--- @param lfs Origin table for lfs module.
--- @param uuid Origin table for uuid module.
--- @param io Origin table for io module.
+-- @param lfs Origin table for lfs module. (optional)
+-- @param uuid Origin table for uuid module. (optional)
+-- @param io Origin table for io module. (optional)
+-- @param os Origin table for os module. (optional)
 -- @param fileHistory Table for saving history of file operations. (optional)
 -- @return Backup table for using in restore method.
-local function createMocks(lfs, uuid, io, fileHistory)
+local function createMocks(lfs, uuid, io, os, fileHistory)
     local backup = {}
     backup.lfs = {}
     backup.uuid = {}
@@ -80,6 +85,10 @@ local function createMocks(lfs, uuid, io, fileHistory)
         end
     end
 
+    if os then
+        os = mock(os, true)
+    end
+
     return backup
 end
 
@@ -105,22 +114,17 @@ end
 
 --- Reverts changes made by createMocks.
 -- @param backup Table with backup savings.
--- @param lfs Mock table of lfs module.
--- @param uuid Mock table of uuid module.
--- @param io Mock table of io module.
-local function revertMocks(backup, lfs, uuid, io)
+-- @param lfs Mock table of lfs module. (optional)
+-- @param uuid Mock table of uuid module. (optional)
+-- @param io Mock table of io module. (optional)
+-- @param os Mock table of io module. (optional)
+local function revertMocks(backup, lfs, uuid, io, os)
     restoreBackup(backup, lfs, uuid, io)
-    if io then
-        io = unwrap(io)
-    end
 
-    if uuid then
-        uuid = unwrap(uuid)
-    end
-
-    if lfs then
-        lfs = unwrap(lfs)
-    end
+    os = unwrap(os)
+    io = unwrap(io)
+    uuid = unwrap(uuid)
+    lfs = unwrap(lfs)
 end
 
 describe("fácil's create command", function()
@@ -158,7 +162,7 @@ describe("fácil's create command", function()
     end)
 
     it("returns error on invalid file creation", function()
-        local backup = createMocks(lfs, uuid)
+        local backup = createMocks(lfs, uuid, nil, os)
         io = mock(io, true)
 
         local result, details = fl.create("name")
@@ -166,11 +170,12 @@ describe("fácil's create command", function()
         assert.is.equal(details:find("Can't create file: "), 1)
 
         io = unwrap(io)
-        revertMocks(backup, lfs, uuid)
+        os = unwrap(os)
+        revertMocks(backup, lfs, uuid, nil, os)
     end)
 
     it("creates card and meta with valid names", function()
-        local backup = createMocks(lfs, uuid)
+        local backup = createMocks(lfs, uuid, nil, os)
         io = mock(io, true)
 
         local result, details = fl.create("new card")
@@ -184,7 +189,7 @@ describe("fácil's create command", function()
         assert.stub(io.open).was.called_with("/xyz/.fl/cards/aa/aa-bbbb-cccc-dddd.md", "w")
 
         io = unwrap(io)
-        revertMocks(backup, lfs, uuid)
+        revertMocks(backup, lfs, uuid, nil, os)
     end)
 
     it("returns error if didn't get current directory", function()
@@ -200,7 +205,7 @@ describe("fácil's create command", function()
     end)
 
     it("creates required directories", function()
-        local backup = createMocks(lfs, uuid)
+        local backup = createMocks(lfs, uuid, nil, os)
         io = mock(io, true)
 
         fl.create("task #1")
@@ -212,12 +217,12 @@ describe("fácil's create command", function()
         assert.stub(lfs.mkdir).was.called_with("/xyz/.fl/cards/aa/")
 
         io = unwrap(io)
-        revertMocks(backup, lfs, uuid)
+        revertMocks(backup, lfs, uuid, nil, os)
     end)
 
     it("fills card with markdown template", function()
         local fileHistory = {}
-        local backup = createMocks(lfs, uuid, io, fileHistory)
+        local backup = createMocks(lfs, uuid, io, os, fileHistory)
 
         fl.create("markdown test card")
 
@@ -228,6 +233,17 @@ describe("fácil's create command", function()
         assert.is.not_equal(fileHistory.write[1][1], nil)
         assert.is.equal(template.value, fileHistory.write[1][1])
 
-        revertMocks(backup, lfs, uuid, io)
+        revertMocks(backup, lfs, uuid, io, os)
+    end)
+
+    it("opens $EDITOR to edit just created card.", function()
+        local backup = createMocks(lfs, uuid, io, os)
+
+        fl.create("opens edior")
+
+        assert.stub(os.execute).was.called(1)
+        assert.stub(os.execute).was.called_with("$EDITOR /xyz/.fl/cards/aa/aa-bbbb-cccc-dddd.md")
+
+        revertMocks(backup, lfs, uuid, io, os)
     end)
 end)
