@@ -17,12 +17,12 @@ local function unwrap(origin)
 end
 
 --- Creates mocks for lfs, uuid and io
--- @param backup Table for backup savings.
 -- @param lfs Origin table for lfs module.
 -- @param uuid Origin table for uuid module.
 -- @param io Origin table for io module.
-local function createMocks(backup, lfs, uuid, io)
-    backup = backup or {}
+-- @return Backup table for using in restore method.
+local function createMocks(lfs, uuid, io)
+    local backup = {}
     backup.lfs = {}
     backup.uuid = {}
     backup.io = {}
@@ -65,6 +65,8 @@ local function createMocks(backup, lfs, uuid, io)
             }
         end
     end
+
+    return backup
 end
 
 --- Restores backup made by createMocks.
@@ -86,7 +88,6 @@ local function restoreBackup(backup, lfs, uuid, io)
         lfs.currentdir = backup.lfs.currentdir
     end
 end
-
 
 --- Reverts changes made by createMocks.
 -- @param backup Table with backup savings.
@@ -143,8 +144,7 @@ describe("fácil's create command", function()
     end)
 
     it("returns error on invalid file creation", function()
-        local backup = {}
-        createMocks(backup, lfs, uuid)
+        local backup = createMocks(lfs, uuid)
         io = mock(io, true)
 
         local result, details = fl.create("name")
@@ -156,8 +156,7 @@ describe("fácil's create command", function()
     end)
 
     it("creates card and meta with valid names", function()
-        local backup = {}
-        createMocks(backup, lfs, uuid)
+        local backup = createMocks(lfs, uuid)
         io = mock(io, true)
 
         local result, details = fl.create("new card")
@@ -187,8 +186,7 @@ describe("fácil's create command", function()
     end)
 
     it("creates required directories", function()
-        local backup = {}
-        createMocks(backup, lfs, uuid)
+        local backup = createMocks(lfs, uuid)
         io = mock(io, true)
 
         fl.create("task #1")
