@@ -32,7 +32,7 @@ handler.flags.version = function()
 end
 
 handler.help = function(usage, name)
-    if not name then
+    if not name or "" == name then
         print [[
 List of commands:
     help [NAME]       Prints either common or detailed help for command 'name'
@@ -52,7 +52,7 @@ All these files are placed inside .fl directory (by default).
 ]]
     else
         print(usage)
-        print("Error: invalid command name: " .. name)
+        print("Error: invalid command name: '" .. tostring(name) .. "'")
         print("Use fl help to show list of supported command.")
     end
 end
