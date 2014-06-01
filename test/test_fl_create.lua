@@ -87,6 +87,13 @@ local function createMocks(lfs, uuid, io, os, fileHistory)
 
     if os then
         os = mock(os, true)
+        backup.os = backup.os or {}
+        backup.os.time = os.time
+
+        os.time = function(...)
+            backup.os.time(...)
+            return 1234567
+        end
     end
 
     return backup
@@ -97,7 +104,12 @@ end
 -- @param lfs Mock table of lfs module.
 -- @param uuid Mock table of uuid module.
 -- @param io Mock table of io module.
-local function restoreBackup(backup, lfs, uuid, io)
+-- @param os Mock table of os module.
+local function restoreBackup(backup, lfs, uuid, io, os)
+    if os then
+        os.time = backup.os.time
+    end
+
     if io then
         io.open = backup.io.open
     end
@@ -119,7 +131,7 @@ end
 -- @param io Mock table of io module. (optional)
 -- @param os Mock table of io module. (optional)
 local function revertMocks(backup, lfs, uuid, io, os)
-    restoreBackup(backup, lfs, uuid, io)
+    restoreBackup(backup, lfs, uuid, io, os)
 
     os = unwrap(os)
     io = unwrap(io)
@@ -149,6 +161,7 @@ describe("fácil's create command", function()
 
         -- Removes all stubs and spies.
         unwrap(io)
+        unwrap(os)
     end)
 
     it("exists", function()
@@ -243,6 +256,41 @@ describe("fácil's create command", function()
 
         assert.stub(os.execute).was.called(1)
         assert.stub(os.execute).was.called_with("$EDITOR /xyz/.fl/cards/aa/aa-bbbb-cccc-dddd.md")
+
+        revertMocks(backup, lfs, uuid, io, os)
+    end)
+
+    it("creates required directories for meta data", function()
+        local backup = createMocks(lfs, uuid, io, os)
+
+        fl.create("meta data")
+
+        -- Restore stub from backup to be able to call was.called
+        restoreBackup(backup, lfs)
+
+        assert.stub(lfs.mkdir).was.called(2)
+        assert.stub(lfs.mkdir).was.called_with("/xyz/.fl/meta/aa/")
+
+        revertMocks(backup, lfs, uuid, io, os)
+    end)
+
+    it("creates metafile for card", function()
+        local fileHistory = {}
+        local backup = createMocks(lfs, uuid, io, os, fileHistory)
+
+        local expected = [[
+return {
+    id = aaaa-bbbb-cccc-dddd,
+    name = meta file,
+    created = 1234567
+}]]
+
+        fl.create("meta file")
+
+        assert.is.not_equal(fileHistory.write, nil)
+        assert.is.not_equal(fileHistory.write[2], nil)
+        assert.is.not_equal(fileHistory.write[2][1], nil)
+        assert.is.equal(expected, fileHistory.write[2][1])
 
         revertMocks(backup, lfs, uuid, io, os)
     end)

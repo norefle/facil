@@ -1,5 +1,5 @@
 return {
     id = "b6223120-f1eb-4a77-b628-72626dfb3aec",
     name = "Card creation",
-    date = 1401312834
+    created = 1401312834
 }
