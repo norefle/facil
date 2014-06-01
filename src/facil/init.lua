@@ -6,6 +6,9 @@
 local FileSystem = require "lfs"
 local Uuid = require "uuid"
 
+local Template = {}
+Template.Md = require "facil.template.md"
+
 local _M = {}
 
 --- Generates full path inside .fl for card or meta files.
@@ -66,6 +69,7 @@ function _M.create(name)
         return nil, "Can't create file: " .. tostring(markdown.name)
     end
 
+    markdown.file:write(Template.Md.value)
     markdown.file:close()
 
     return true

@@ -20,8 +20,9 @@ end
 -- @param lfs Origin table for lfs module.
 -- @param uuid Origin table for uuid module.
 -- @param io Origin table for io module.
+-- @param fileHistory Table for saving history of file operations. (optional)
 -- @return Backup table for using in restore method.
-local function createMocks(lfs, uuid, io)
+local function createMocks(lfs, uuid, io, fileHistory)
     local backup = {}
     backup.lfs = {}
     backup.uuid = {}
@@ -60,8 +61,21 @@ local function createMocks(lfs, uuid, io)
         io.open = function(...)
             backup.io.open(...)
             return {
-                read = function(...) return "file:data" end,
-                close = function(...) return true end
+                read = function(self, ...)
+                    return "file:data"
+                end,
+
+                close = function(self, ...)
+                    return true
+                end,
+
+                write = function(self, ...)
+                    if fileHistory then
+                        fileHistory.write = fileHistory.write or {}
+                        fileHistory.write[#fileHistory.write + 1] = {...}
+                    end
+                    return true
+                end
             }
         end
     end
@@ -199,5 +213,21 @@ describe("fácil's create command", function()
 
         io = unwrap(io)
         revertMocks(backup, lfs, uuid)
+    end)
+
+    it("fills card with markdown template", function()
+        local fileHistory = {}
+        local backup = createMocks(lfs, uuid, io, fileHistory)
+
+        fl.create("markdown test card")
+
+        local template = require "facil.template.md"
+
+        assert.is.not_equal(fileHistory.write, nil)
+        assert.is.not_equal(fileHistory.write[1], nil)
+        assert.is.not_equal(fileHistory.write[1][1], nil)
+        assert.is.equal(template.value, fileHistory.write[1][1])
+
+        revertMocks(backup, lfs, uuid, io)
     end)
 end)
