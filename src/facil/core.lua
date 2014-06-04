@@ -87,7 +87,7 @@ end
 
 --- Creates new card
 -- @param name Short descriptive name of card.
--- @retval true, nil - on success.
+-- @retval true, string - on success, where string is the uuid of new card.
 -- @retval nil, string - on error, where string contains detailed description.
 function _M.create(name)
     if not name or "string" ~= type(name) then
@@ -124,7 +124,7 @@ function _M.create(name)
         return nil, metaErr
     end
 
-    return true
+    return true, card.id
 end
 
 return _M

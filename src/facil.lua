@@ -22,7 +22,7 @@ _M.NAME = "fácil"
 -- All these files are placed inside .fl directory (by default).
 --
 -- @param name Short and descriptive name of new card. (string, mandatory)
--- @retval true, nil - on success.
+-- @retval true, string - on success, where string is the uuid of new card.
 -- @retval nil, string - on error, where string contains detailed description.
 _M.create = Core.create
 

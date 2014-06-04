@@ -294,4 +294,15 @@ return {
 
         revertMocks(backup, lfs, uuid, io, os)
     end)
+
+    it("returns id of new card", function()
+        local backup = createMocks(lfs, uuid, io, os)
+
+        local code, id = fl.create("create returns id")
+
+        assert.is.equal(true, code)
+        assert.is.equal("aaaa-bbbb-cccc-dddd", id)
+
+        revertMocks(backup, lfs, uuid, io, os)
+    end)
 end)
