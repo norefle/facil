@@ -92,12 +92,13 @@ local function serializeMeta(card)
         return nil
     end
 
-    local meta = {}
-    meta[#meta + 1] = "return {"
-    meta[#meta + 1] = "    id = " .. card.id .. ","
-    meta[#meta + 1] = "    name = " .. card.name .. ","
-    meta[#meta + 1] = "    created = " .. tostring(card.time) .. ""
-    meta[#meta + 1] = "}"
+    local meta = {
+        "return {",
+        "    id = " .. card.id .. ",",
+        "    name = " .. card.name .. ",",
+        "    created = " .. tostring(card.time) .. "",
+        "}"
+    }
 
     return table.concat(meta, "\n")
 end
@@ -158,14 +159,15 @@ function _M.init(root)
         return nil, "Invalid argument."
     end
 
-    local directories = {}
-    directories[#directories + 1] = root .. "/.fl"
-    directories[#directories + 1] = root .. "/.fl/boards"
-    directories[#directories + 1] = root .. "/.fl/boards/backlog"
-    directories[#directories + 1] = root .. "/.fl/boards/progress"
-    directories[#directories + 1] = root .. "/.fl/boards/done"
-    directories[#directories + 1] = root .. "/.fl/cards"
-    directories[#directories + 1] = root .. "/.fl/meta"
+    local directories = {
+        root .. "/.fl",
+        root .. "/.fl/boards",
+        root .. "/.fl/boards/backlog",
+        root .. "/.fl/boards/progress",
+        root .. "/.fl/boards/done",
+        root .. "/.fl/cards",
+        root .. "/.fl/meta"
+    }
 
     for _, path in pairs(directories) do
         if not createDir(path) then
