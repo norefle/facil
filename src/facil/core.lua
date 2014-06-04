@@ -131,4 +131,12 @@ function _M.create(name)
     return true, card.id
 end
 
+--- Initialized fácil's file system layout inside selected directory.
+-- @param root Path to the root directory, where to initialize fl.
+-- @retval true - on success
+-- @retval nil, string - on error, where string contains detailed description.
+function _M.init(root)
+    return nil, "Not implemented"
+end
+
 return _M
