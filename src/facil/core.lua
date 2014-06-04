@@ -8,6 +8,7 @@ local Uuid = require "uuid"
 
 local Template = {}
 Template.Md = require "facil.template.md"
+Template.Config = require "facil.template.default_config"
 
 local _M = {}
 
@@ -16,15 +17,20 @@ local _M = {}
 -- @param prefix Name of subfolder inside the root as string.
 -- @return string with full path with trailing / on success, nil otherwise
 local function generatePath(root, prefix)
-    assert(root and "string" == type(root))
-    assert(prefix and "string" == type(prefix))
-
     local pwd = FileSystem.currentdir()
     if not pwd then
         return nil
     end
 
-    return table.concat{ pwd, "/.fl/", root, "/", prefix, "/" }
+    local path = { pwd, ".fl" }
+    if root and "" ~= root then
+        path[#path + 1] = root
+    end
+    if prefix and "" ~= prefix then
+        path[#path + 1] = prefix
+    end
+
+    return table.concat(path, "/")
 end
 
 --- Creates directory if doesn't exist.
@@ -50,7 +56,13 @@ local function createCardFile(root, prefix, infix, suffix, content)
     if not data.path then
         return nil, "Can't generate file name for card."
     end
-    data.name = data.path .. infix
+
+    local fullName = { data.path }
+
+    if infix and "" ~= infix then
+        fullName[#fullName + 1] = infix
+    end
+    data.name = table.concat(fullName, "/")
 
     if suffix and "" ~= suffix then
         data.name = data.name .. suffix
@@ -159,6 +171,12 @@ function _M.init(root)
         if not createDir(path) then
             return nil, "Can't create directory: " .. path
         end
+    end
+
+    local configSuccess, configError =
+        createCardFile("", nil, "config", nil, Template.Config.value)
+    if not configSuccess then
+        return nil, configError
     end
 
     return true

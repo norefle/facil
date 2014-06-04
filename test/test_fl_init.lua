@@ -102,4 +102,32 @@ describe("fácil's init command", function()
 
         revertMocks(backup, lfs, nil, io)
     end)
+
+    it("creates .fl/config file", function()
+        local backup = createMocks(lfs, nil, io)
+
+        fl.init(ROOT)
+        restoreBackup(backup, nil, nil, io)
+
+        assert.stub(io.open).was.called()
+        assert.stub(io.open).was.called_with(ROOT .. "/.fl/config", "w")
+
+        revertMocks(backup, lfs, nil, io)
+    end)
+
+    it("fills config file with default template", function()
+        local fileHistory = {}
+        local backup = createMocks(lfs, nil, io, nil, fileHistory)
+
+        local config = require "facil.template.default_config"
+
+        fl.init(ROOT)
+
+        assert.is.not_equal(nil, fileHistory.write)
+        assert.is.not_equal(nil, fileHistory.write[1], nil)
+        assert.is.not_equal(nil, fileHistory.write[1][1], nil)
+        assert.is.equal(config.value, fileHistory.write[1][1])
+
+        revertMocks(backup, lfs, nil, io, nil)
+    end)
 end)

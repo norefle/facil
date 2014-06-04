@@ -108,7 +108,7 @@ describe("fácil's create command", function()
         restoreBackup(backup, lfs)
 
         assert.stub(lfs.mkdir).was.called(1)
-        assert.stub(lfs.mkdir).was.called_with(CARDS .. UUID_HEAD .. "/")
+        assert.stub(lfs.mkdir).was.called_with(CARDS .. UUID_HEAD)
 
         io = unwrap(io)
         revertMocks(backup, lfs, uuid, nil, os)
@@ -150,7 +150,7 @@ describe("fácil's create command", function()
         restoreBackup(backup, lfs)
 
         assert.stub(lfs.mkdir).was.called()
-        assert.stub(lfs.mkdir).was.called_with(META .. UUID_HEAD .. "/")
+        assert.stub(lfs.mkdir).was.called_with(META .. UUID_HEAD)
 
         revertMocks(backup, lfs, uuid, io, os)
     end)
