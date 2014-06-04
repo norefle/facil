@@ -159,14 +159,16 @@ describe("fácil's create command", function()
         local fileHistory = {}
         local backup = createMocks(lfs, uuid, io, os, fileHistory)
 
-        local expected = [[
-return {
-    id = aaaa-bbbb-cccc-dddd,
-    name = meta file,
-    created = 1234567
-}]]
+        local taskName = "meta file"
+        local expected = table.concat{
+            "return {", "\n",
+            "    id = ", UUID, ",", "\n",
+            "    name = ", taskName, ",", "\n",
+            "    created = ", TIMESTAMP, "\n",
+            "}"
+        }
 
-        fl.create("meta file")
+        fl.create(taskName)
 
         assert.is.not_equal(fileHistory.write, nil)
         assert.is.not_equal(fileHistory.write[2], nil)
