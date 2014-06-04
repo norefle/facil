@@ -93,11 +93,11 @@ local function serializeMeta(card)
     end
 
     local meta = {
-        "return {",
-        "    id = " .. card.id .. ",",
-        "    name = " .. card.name .. ",",
-        "    created = " .. tostring(card.time) .. "",
-        "}"
+        [[return {]],
+        [[    id = "]] .. card.id .. [[",]],
+        [[    name = "]] .. card.name .. [[",]],
+        [[    created = ]] .. tostring(card.time),
+        [[}]]
     }
 
     return table.concat(meta, "\n")

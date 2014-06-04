@@ -1,5 +1,5 @@
 return {
-    id = 5ff35eaa-27a2-49bd-9d7f-7d7376c007a6,
-    name = Fácil initialization,
+    id = "5ff35eaa-27a2-49bd-9d7f-7d7376c007a6",
+    name = "Fácil initialization",
     created = 1401894093
 }

@@ -162,8 +162,8 @@ describe("fácil's create command", function()
         local taskName = "meta file"
         local expected = table.concat{
             "return {", "\n",
-            "    id = ", UUID, ",", "\n",
-            "    name = ", taskName, ",", "\n",
+            "    id = \"", UUID, "\",", "\n",
+            "    name = \"", taskName, "\",", "\n",
             "    created = ", TIMESTAMP, "\n",
             "}"
         }

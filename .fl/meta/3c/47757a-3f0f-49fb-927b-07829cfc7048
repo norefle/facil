@@ -1,5 +1,5 @@
 return {
-    id = 3c47757a-3f0f-49fb-927b-07829cfc7048,
-    name = fl create puts card in backlog,
+    id = "3c47757a-3f0f-49fb-927b-07829cfc7048",
+    name = "fl create puts card in backlog",
     created = 1401657824
 }

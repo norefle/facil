@@ -1,5 +1,5 @@
 return {
-    id = 37a91d20-d8fd-4cb6-aeec-fab3be01d2cc,
+    id = "37a91d20-d8fd-4cb6-aeec-fab3be01d2cc",
     name = "init" command,
     created = 1401894407
 }
