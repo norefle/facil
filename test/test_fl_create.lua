@@ -3,141 +3,22 @@
 --- @brief Unit test for fl create command.
 ----------------------------------------------------------------------------]]--
 
---- Reverts mocking of table (see busted's mock and stub functions)
--- @param origin Table previously wrapped with mock() function.
--- @return Table with removed stub wrappers.
-local function unwrap(origin)
-    if not origin or "table" ~= type(origin) then
-        return origin
-    end
+local Helpers = require "test.helpers"
 
-    for _, value in pairs(origin) do
-        if "table" == type(value) and "function" == type(value.revert) then
-            value:revert()
-        end
-    end
+local UUID = Helpers.FAKE_UUID
+local UUID_HEAD = Helpers.FAKE_UUID_HEAD
+local UUID_TAIL = Helpers.FAKE_UUID_TAIL
+local ROOT = Helpers.FAKE_ROOT
+local TIMESTAMP = Helpers.FAKE_OS_TIME
+local createMocks = Helpers.createMocks
+local unwrap = Helpers.unwrap
+local restoreBackup = Helpers.restoreBackup
+local revertMocks = Helpers.revertMocks
 
-    return origin
-end
-
---- Creates mocks for lfs, uuid and io
--- @param lfs Origin table for lfs module. (optional)
--- @param uuid Origin table for uuid module. (optional)
--- @param io Origin table for io module. (optional)
--- @param os Origin table for os module. (optional)
--- @param fileHistory Table for saving history of file operations. (optional)
--- @return Backup table for using in restore method.
-local function createMocks(lfs, uuid, io, os, fileHistory)
-    local backup = {}
-    backup.lfs = {}
-    backup.uuid = {}
-    backup.io = {}
-
-    if lfs then
-        lfs = mock(lfs, true)
-
-        backup.lfs.mkdir = lfs.mkdir
-        lfs.mkdir = function(...)
-            backup.lfs.mkdir(...)
-            return true
-        end
-
-        backup.lfs.currentdir = lfs.currentdir
-        lfs.currentdir = function(...)
-            backup.lfs.currentdir(...)
-            return "/xyz"
-        end
-    end
-
-    if uuid then
-        uuid = mock(uuid, true)
-
-        backup.uuid.new = uuid.new
-        uuid.new = function(...)
-            backup.uuid.new(...)
-            return "aaaa-bbbb-cccc-dddd"
-        end
-    end
-
-    if io then
-        io = mock(io, true)
-
-        backup.io.open = io.open
-        io.open = function(...)
-            backup.io.open(...)
-            return {
-                read = function(self, ...)
-                    return "file:data"
-                end,
-
-                close = function(self, ...)
-                    return true
-                end,
-
-                write = function(self, ...)
-                    if fileHistory then
-                        fileHistory.write = fileHistory.write or {}
-                        fileHistory.write[#fileHistory.write + 1] = {...}
-                    end
-                    return true
-                end
-            }
-        end
-    end
-
-    if os then
-        os = mock(os, true)
-        backup.os = backup.os or {}
-        backup.os.time = os.time
-
-        os.time = function(...)
-            backup.os.time(...)
-            return 1234567
-        end
-    end
-
-    return backup
-end
-
---- Restores backup made by createMocks.
--- @param backup Table with backup savings.
--- @param lfs Mock table of lfs module.
--- @param uuid Mock table of uuid module.
--- @param io Mock table of io module.
--- @param os Mock table of os module.
-local function restoreBackup(backup, lfs, uuid, io, os)
-    if os then
-        os.time = backup.os.time
-    end
-
-    if io then
-        io.open = backup.io.open
-    end
-
-    if uuid then
-        uuid.new = backup.uuid.new
-    end
-
-    if lfs then
-        lfs.mkdir = backup.lfs.mkdir
-        lfs.currentdir = backup.lfs.currentdir
-    end
-end
-
---- Reverts changes made by createMocks.
--- @param backup Table with backup savings.
--- @param lfs Mock table of lfs module. (optional)
--- @param uuid Mock table of uuid module. (optional)
--- @param io Mock table of io module. (optional)
--- @param os Mock table of io module. (optional)
-local function revertMocks(backup, lfs, uuid, io, os)
-    restoreBackup(backup, lfs, uuid, io, os)
-
-    os = unwrap(os)
-    io = unwrap(io)
-    uuid = unwrap(uuid)
-    lfs = unwrap(lfs)
-end
+local CARDS = ROOT .. "/.fl/cards/"
+local META = ROOT .. "/.fl/meta/"
+local BOARDS = ROOT .. "/.fl/boards/"
+local CARD_MD = CARDS .. UUID_HEAD .. "/" .. UUID_TAIL .. ".md"
 
 describe("fácil's create command", function()
     local fl -- Core module of fácil.
@@ -199,7 +80,7 @@ describe("fácil's create command", function()
 
         -- Check that stub was called with correct arguments.
         assert.stub(io.open).was.called(1)
-        assert.stub(io.open).was.called_with("/xyz/.fl/cards/aa/aa-bbbb-cccc-dddd.md", "w")
+        assert.stub(io.open).was.called_with(CARD_MD, "w")
 
         io = unwrap(io)
         revertMocks(backup, lfs, uuid, nil, os)
@@ -227,7 +108,7 @@ describe("fácil's create command", function()
         restoreBackup(backup, lfs)
 
         assert.stub(lfs.mkdir).was.called(1)
-        assert.stub(lfs.mkdir).was.called_with("/xyz/.fl/cards/aa/")
+        assert.stub(lfs.mkdir).was.called_with(CARDS .. UUID_HEAD .. "/")
 
         io = unwrap(io)
         revertMocks(backup, lfs, uuid, nil, os)
@@ -255,7 +136,7 @@ describe("fácil's create command", function()
         fl.create("opens edior")
 
         assert.stub(os.execute).was.called(1)
-        assert.stub(os.execute).was.called_with("$EDITOR /xyz/.fl/cards/aa/aa-bbbb-cccc-dddd.md")
+        assert.stub(os.execute).was.called_with("$EDITOR " .. CARD_MD)
 
         revertMocks(backup, lfs, uuid, io, os)
     end)
@@ -269,7 +150,7 @@ describe("fácil's create command", function()
         restoreBackup(backup, lfs)
 
         assert.stub(lfs.mkdir).was.called()
-        assert.stub(lfs.mkdir).was.called_with("/xyz/.fl/meta/aa/")
+        assert.stub(lfs.mkdir).was.called_with(META .. UUID_HEAD .. "/")
 
         revertMocks(backup, lfs, uuid, io, os)
     end)
@@ -301,9 +182,9 @@ return {
         local code, id = fl.create("create returns id")
 
         assert.is.equal(true, code)
-        assert.is.equal("aaaa-bbbb-cccc-dddd", id)
+        assert.is.equal(UUID, id)
 
-        revertMocks(backup, lfs, uuid, io, os)
+        Helpers.revertMocks(backup, lfs, uuid, io, os)
     end)
 
     it("sticks new card onto backlog board", function()
@@ -312,7 +193,7 @@ return {
         fl.create("new card to backlog")
 
         restoreBackup(backup, nil, nil, io)
-        assert.stub(io.open).was.called_with("/xyz/.fl/boards/backlog/aaaa-bbbb-cccc-dddd", "w")
+        assert.stub(io.open).was.called_with(BOARDS .. "backlog/" .. UUID, "w")
 
         revertMocks(backup, lfs, uuid, io, os)
     end)
@@ -326,7 +207,7 @@ return {
         assert.is.not_equal(fileHistory.write, nil)
         assert.is.not_equal(fileHistory.write[3], nil)
         assert.is.not_equal(fileHistory.write[3][1], nil)
-        assert.is.equal("1234567", fileHistory.write[3][1])
+        assert.is.equal(tostring(TIMESTAMP), fileHistory.write[3][1])
 
         revertMocks(backup, lfs, uuid, io, os)
     end)
