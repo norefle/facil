@@ -37,4 +37,69 @@ describe("fácil's init command", function()
     it("exists", function()
         assert.is.not_equal(fl.init, nil)
     end)
+
+    it("returns error on empty argument", function()
+        local success, description = fl.init(nil)
+        assert.is.equal(nil, success)
+        assert.is.equal("Invalid argument.", description)
+    end)
+
+    it("returns success on valid argument", function()
+        local backup = createMocks(lfs, nil, io)
+
+        local success, description = fl.init(ROOT)
+        assert.is.equal(true, success)
+        assert.is.equal(nil, description)
+
+        revertMocks(backup, lfs, nil, io)
+    end)
+
+    it("creates .fl directory", function()
+        local backup = createMocks(lfs, nil, io)
+        local flRoot = ROOT .. "/.fl"
+
+        fl.init(ROOT)
+        restoreBackup(backup, lfs)
+
+        assert.stub(lfs.mkdir).was.called()
+        assert.stub(lfs.mkdir).was.called_with(flRoot)
+
+        revertMocks(backup, lfs, nil, io)
+    end)
+
+    it("creates .fl/meta and .fl/cards directories", function()
+        local backup = createMocks(lfs, nil, io)
+        local meta = ROOT .. "/.fl/meta"
+        local cards = ROOT .. "/.fl/cards"
+
+
+        fl.init(ROOT)
+        restoreBackup(backup, lfs)
+
+        assert.stub(lfs.mkdir).was.called()
+        assert.stub(lfs.mkdir).was.called_with(cards)
+        assert.stub(lfs.mkdir).was.called_with(meta)
+
+        revertMocks(backup, lfs, nil, io)
+    end)
+
+    it("creates all .fl/boards directories", function()
+        local backup = createMocks(lfs, nil, io)
+        local boards = ROOT .. "/.fl/boards"
+        local backlog = boards .. "/backlog"
+        local progress = boards .. "/progress"
+        local done = boards .. "/done"
+
+
+        fl.init(ROOT)
+        restoreBackup(backup, lfs)
+
+        assert.stub(lfs.mkdir).was.called()
+        assert.stub(lfs.mkdir).was.called_with(boards)
+        assert.stub(lfs.mkdir).was.called_with(backlog)
+        assert.stub(lfs.mkdir).was.called_with(progress)
+        assert.stub(lfs.mkdir).was.called_with(done)
+
+        revertMocks(backup, lfs, nil, io)
+    end)
 end)

@@ -154,10 +154,10 @@ end
 function Helpers.revertMocks(backup, lfs, uuid, io, os)
     Helpers.restoreBackup(backup, lfs, uuid, io, os)
 
-    os = Helpers.unwrap(os)
-    io = Helpers.unwrap(io)
-    uuid = Helpers.unwrap(uuid)
-    lfs = Helpers.unwrap(lfs)
+    Helpers.unwrap(os)
+    Helpers.unwrap(io)
+    Helpers.unwrap(uuid)
+    Helpers.unwrap(lfs)
 end
 
 --------------------------------------------------------------------------------

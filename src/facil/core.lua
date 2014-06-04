@@ -27,6 +27,14 @@ local function generatePath(root, prefix)
     return table.concat{ pwd, "/.fl/", root, "/", prefix, "/" }
 end
 
+--- Creates directory if doesn't exist.
+-- @param path Path to create directory
+-- @return true on success, false otherwise.
+local function createDir(path)
+    return ("directory" == FileSystem.attributes(path, "mode"))
+        or FileSystem.mkdir(path)
+end
+
 --- Creates directories, files for card or metadata.
 -- @param root Root directory of created file ("crads" | "meta" | "boards").
 -- @param prefix Name prefix, used to create directory.
@@ -48,9 +56,7 @@ local function createCardFile(root, prefix, infix, suffix, content)
         data.name = data.name .. suffix
     end
 
-    if not lfs.attributes(data.path)
-        and not lfs.mkdir(data.path)
-    then
+    if not createDir(data.path) then
         return nil, "Can't create dir: " .. data.path
     end
 
@@ -136,7 +142,26 @@ end
 -- @retval true - on success
 -- @retval nil, string - on error, where string contains detailed description.
 function _M.init(root)
-    return nil, "Not implemented"
+    if not root or "string" ~= type(root) then
+        return nil, "Invalid argument."
+    end
+
+    local directories = {}
+    directories[#directories + 1] = root .. "/.fl"
+    directories[#directories + 1] = root .. "/.fl/boards"
+    directories[#directories + 1] = root .. "/.fl/boards/backlog"
+    directories[#directories + 1] = root .. "/.fl/boards/progress"
+    directories[#directories + 1] = root .. "/.fl/boards/done"
+    directories[#directories + 1] = root .. "/.fl/cards"
+    directories[#directories + 1] = root .. "/.fl/meta"
+
+    for _, path in pairs(directories) do
+        if not createDir(path) then
+            return nil, "Can't create directory: " .. path
+        end
+    end
+
+    return true
 end
 
 return _M

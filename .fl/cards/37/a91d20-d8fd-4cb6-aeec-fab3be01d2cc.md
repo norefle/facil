@@ -10,8 +10,8 @@ Syntax:
 
 On "init" fl have to do following:
 
-  (x) Create root dir: $ROOT/.fl
-  (x) Create subdirs:
+  (✔) Create root dir: $ROOT/.fl
+  (✔) Create subdirs:
         $ROOT/.fl/cards
         $ROOT/.fl/meta
         $ROOT/.fl/boards
