@@ -12,7 +12,7 @@ Template.Md = require "facil.template.md"
 local _M = {}
 
 --- Generates full path inside .fl for card or meta files.
--- @param root Root folder of file inside .fl ("cards", "meta") as string.
+-- @param root Root folder of file inside .fl ("cards", "meta", "boards") as string.
 -- @param prefix Name of subfolder inside the root as string.
 -- @return string with full path with trailing / on success, nil otherwise
 local function generatePath(root, prefix)
@@ -24,12 +24,11 @@ local function generatePath(root, prefix)
         return nil
     end
 
-    --local fullName = { pwd, "/.fl/", root, "/", prefix, "/", name }
     return table.concat{ pwd, "/.fl/", root, "/", prefix, "/" }
 end
 
 --- Creates directories, files for card or metadata.
--- @param root Root directory of created file ("crads" | "meta").
+-- @param root Root directory of created file ("crads" | "meta" | "boards").
 -- @param prefix Name prefix, used to create directory.
 -- @param infix Name infix, used to create file name.
 -- @param suffix Name suffix, used to create file extension. (optional)
@@ -122,6 +121,11 @@ function _M.create(name)
         = createCardFile("meta", prefix, body, nil, serializeMeta(card))
     if not meta then
         return nil, metaErr
+    end
+
+    local marker, markerErr = createCardFile("boards", "backlog", card.id, nil, tostring(card.time))
+    if not marker then
+        return nil, markerErr
     end
 
     return true, card.id

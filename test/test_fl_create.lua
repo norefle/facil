@@ -268,7 +268,7 @@ describe("fácil's create command", function()
         -- Restore stub from backup to be able to call was.called
         restoreBackup(backup, lfs)
 
-        assert.stub(lfs.mkdir).was.called(2)
+        assert.stub(lfs.mkdir).was.called()
         assert.stub(lfs.mkdir).was.called_with("/xyz/.fl/meta/aa/")
 
         revertMocks(backup, lfs, uuid, io, os)
@@ -302,6 +302,31 @@ return {
 
         assert.is.equal(true, code)
         assert.is.equal("aaaa-bbbb-cccc-dddd", id)
+
+        revertMocks(backup, lfs, uuid, io, os)
+    end)
+
+    it("sticks new card onto backlog board", function()
+        local backup = createMocks(lfs, uuid, io, os)
+
+        fl.create("new card to backlog")
+
+        restoreBackup(backup, nil, nil, io)
+        assert.stub(io.open).was.called_with("/xyz/.fl/boards/backlog/aaaa-bbbb-cccc-dddd", "w")
+
+        revertMocks(backup, lfs, uuid, io, os)
+    end)
+
+    it("puts timestamp into marker file inside backlog", function()
+        local fileHistory = {}
+        local backup = createMocks(lfs, uuid, io, os, fileHistory)
+
+        fl.create("timestamp in backlog")
+
+        assert.is.not_equal(fileHistory.write, nil)
+        assert.is.not_equal(fileHistory.write[3], nil)
+        assert.is.not_equal(fileHistory.write[3][1], nil)
+        assert.is.equal("1234567", fileHistory.write[3][1])
 
         revertMocks(backup, lfs, uuid, io, os)
     end)
