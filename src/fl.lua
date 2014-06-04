@@ -31,11 +31,12 @@ handler.flags.version = function()
     print(FACIL_CLI_NAME .. ": " .. FACIL_NAME .. " v" .. FACIL_VERSION)
 end
 
-handler.help = function(usage, name)
+handler.help = function(name)
     if not name or "" == name then
         print [[
 List of commands:
     help [NAME]       Prints either common or detailed help for command 'name'
+    init ROOT         Initializes fácil within 'root' directory.
     create NAME       Creates new card with selected name.
 ]]
     elseif "create" == name then
@@ -50,22 +51,44 @@ Card consists of three files:
   3 Status file - empty file in boards pointed to current status of the card.
 All these files are placed inside .fl directory (by default).
 ]]
+    elseif "init" == name then
+        print [[
+fl init ROOT
+
+Creates fácil's file system layout inside selected directory and all required files.
+File system layout is:
+  ROOT/                           - Selected root, passed as root param.
+      .fl/                        - Root directory for entire fácil.
+          boards/                 - Root directory for boards.
+              backlog/            - Initial board, all new tasks are sticked here.
+              progress/           - All task which are in progress are sticked here.
+              done/               - All finished tasks.
+          cards/                  - All tasks ever created.
+          meta/                   - Description of tasks.
+          config                  - Local configuration file.
+]]
     else
-        print(usage)
-        print("Error: invalid command name: '" .. tostring(name) .. "'")
-        print("Use fl help to show list of supported command.")
+        return nil, "Error: invalid command name: '" .. tostring(name) .. "'"
     end
+
+    return true
 end
 
-handler.create = function(usage, name)
+handler.create = function(name)
     if not name then
-        print(usage)
-        print("Error: name should be non empty to create card")
+        return nil, "Error: name should be non empty to create card."
     end
 
-    Fl.create(name)
+    return Fl.create(name)
 end
 
+handler.init = function(rootPath)
+    if not rootPath then
+        return nil, "Error: root should be non empty to initialize fácil."
+    end
+
+    return Fl.init(rootPath)
+end
 
 --- Entry point.
 -- @param ... command line arguments passed to cli application.
@@ -89,10 +112,18 @@ local function main(...)
                 print("Invalid command: " .. command)
                 return
             end
-            handler[command](usage, arguments.ARGS)
+            local code, description = handler[command](arguments.ARGS)
+            if not code then
+                print(usage)
+                print(description)
+                print("Use either fl help or fl --help for command and general help topics.")
+                return -1
+            end
         end
     end
+
+    return 0
 end
 
 --------------------------------------------------------------------------------
-main(...)
+return main(...)
