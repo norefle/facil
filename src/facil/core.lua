@@ -12,6 +12,17 @@ Template.Config = require "facil.template.default_config"
 
 local _M = {}
 
+--- @brief Finds root directory of fácil.
+-- It searched from current directory to its parents up to file system root.
+-- If .fl was found either current directory or in parent directory
+-- then it will return full path to directory contained .fl.
+-- Otherwise it will return nil
+-- @return Full path to .fl directory on success, nil otherwise.
+local function findFlRoot()
+    --- @warning Not implementd yet
+    return FileSystem.currentdir()
+end
+
 --- Generates full path inside .fl for card or meta files.
 -- @param root Root folder of file inside .fl ("cards", "meta", "boards") as string.
 -- @param prefix Name of subfolder inside the root as string.
@@ -182,6 +193,50 @@ function _M.init(root)
     end
 
     return true
+end
+
+--- Returns current status of the board with tasks on it.
+-- @return Board description.
+-- @note Here is the example of returned board:
+--      @code
+--          board = {
+--              -- Lane number 0, with flag initial = true
+--              {
+--                  name = "Backlog",
+--                  tasks = {
+--                      -- Array of tasks, ordered by date (asc)
+--                      {
+--                          name = "Task #1",
+--                          id = "aaaa-bbbb-cccc-dddd",
+--                          created = 123456789,
+--                          moved = 234567890
+--                      },
+--                      ...
+--                  }
+--              },
+--              ...
+--          }
+--      @endcode
+function _M.status()
+    local board = {}
+
+    local root = findFlRoot()
+    if not root then
+        return nil, "It's not a fácil board."
+    end
+
+    for lane in lfs.dir(root .. "/boards") do
+        if lane ~= "."
+            and lane ~= ".."
+            and "directory" == lfs.attributes(lane, "mode")
+        then
+            -- @todo Sort boards in order of inital -> intermediate -> finish
+            --       Get all these information from config file.
+            board[#board + 1] = { name = lane, tasks = { } }
+        end
+    end
+
+    return board
 end
 
 return _M

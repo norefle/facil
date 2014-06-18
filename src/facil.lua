@@ -47,4 +47,7 @@ _M.init = Core.init
 -- @retval nil, string - on error, where string contains detailed description.
 _M.create = Core.create
 
+--- @brief Returns current status of fácil's board.
+_M.status = Core.status
+
 return _M
