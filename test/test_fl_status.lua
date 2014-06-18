@@ -54,7 +54,7 @@ describe("fácil's status command", function()
         local board = fl.status()
         assert.is.equal("table", type(board[1].tasks))
         assert.is.equal(2, #board[1].tasks)
-        assert.is.equal("Task #1", board[1][1].name)
+        assert.is.equal("Task #1", board[1].tasks[1].name)
 
         revertMocks(backup, lfs, nil, io)
     end)
