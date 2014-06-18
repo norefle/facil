@@ -68,6 +68,46 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
             backup.lfs.currentdir(...)
             return Helpers.FAKE_ROOT
         end
+
+        backup.lfs.dir = lfs.dir
+        lfs.dir = function(...)
+            backup.lfs.dir(...)
+            local iterator = function(storage, ...)
+                local result = nil
+                if storage.step == 1 then
+                    storage.step = 2
+                    result = "Backlog"
+                elseif storage.step == 2 then
+                    storage.step = 3
+                    result = "Progress"
+                elseif storage.step == 3 then
+                    storage.step = 4
+                    result = "Done"
+                else
+                    result = nil
+                end
+
+                return result
+            end
+
+            return iterator, { step = 1 }, "."
+        end
+
+        backup.lfs.attributes = lfs.attributes
+        lfs.attributes = function(...)
+            backup.lfs.attributes(...)
+            local args = { ... }
+            if args[2] == "mode" then
+                if args[1]:find("Backlog")
+                    or args[1]:find("Progress")
+                    or args[1]:find("Done")
+                then
+                    return "directory"
+                end
+            end
+
+            return nil
+        end
     end
 
     if uuid then
