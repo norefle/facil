@@ -51,10 +51,59 @@ describe("fácil's status command", function()
     it("returns tasks per lane", function()
         local backup = createMocks(lfs, nil, io)
 
+        local oldReuquire = require
+        require = function(name)
+            if name then
+                return {
+                    id = name,
+                    name = "Task #1",
+                    created = 123
+                }
+            else
+                return oldReuquire(name)
+            end
+        end
+
         local board = fl.status()
         assert.is.equal("table", type(board[1].tasks))
         assert.is.equal(2, #board[1].tasks)
         assert.is.equal("Task #1", board[1].tasks[1].name)
+
+        require = oldReuquire
+
+        revertMocks(backup, lfs, nil, io)
+    end)
+
+    pending("returns task in ascending order by moving date", function()
+        local backup = createMocks(lfs, nil, io)
+
+        local oldReuquire = require
+        require = function(name)
+            if "/xyz/.fl/meta/ta/sk_1" == name then
+                return {
+                    id = name,
+                    name = "Task #1",
+                    created = 123
+                }
+
+            elseif "/xyz/.fl/meta/ta/sk_2" == name then
+                return {
+                    id = name,
+                    name = "Task #2",
+                    created = 12
+                }
+            else
+                return oldReuquire(name)
+            end
+        end
+
+        local board = fl.status()
+        assert.is.equal("table", type(board[1].tasks))
+        assert.is.equal(2, #board[1].tasks)
+        assert.is.equal(13, board[1].tasks[1].moved)
+        assert.is.equal(456, board[1].tasks[2].moved)
+
+        require = oldReuquire
 
         revertMocks(backup, lfs, nil, io)
     end)
