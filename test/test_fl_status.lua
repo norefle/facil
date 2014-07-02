@@ -51,8 +51,8 @@ describe("fácil's status command", function()
     it("returns tasks per lane", function()
         local backup = createMocks(lfs, nil, io)
 
-        local oldReuquire = require
-        require = function(name)
+        local oldDofile = require
+        dofile = function(name)
             if name then
                 return {
                     id = name,
@@ -60,7 +60,7 @@ describe("fácil's status command", function()
                     created = 123
                 }
             else
-                return oldReuquire(name)
+                return oldDofile(name)
             end
         end
 
@@ -69,7 +69,7 @@ describe("fácil's status command", function()
         assert.is.equal(2, #board[1].tasks)
         assert.is.equal("Task #1", board[1].tasks[1].name)
 
-        require = oldReuquire
+        dofile = oldDofile
 
         revertMocks(backup, lfs, nil, io)
     end)
@@ -77,8 +77,8 @@ describe("fácil's status command", function()
     pending("returns task in ascending order by moving date", function()
         local backup = createMocks(lfs, nil, io)
 
-        local oldReuquire = require
-        require = function(name)
+        local oldDofile = dofile
+        dofile = function(name)
             if "/xyz/.fl/meta/ta/sk_1" == name then
                 return {
                     id = name,
@@ -93,7 +93,7 @@ describe("fácil's status command", function()
                     created = 12
                 }
             else
-                return oldReuquire(name)
+                return oldDofile(name)
             end
         end
 
@@ -103,7 +103,7 @@ describe("fácil's status command", function()
         assert.is.equal(13, board[1].tasks[1].moved)
         assert.is.equal(456, board[1].tasks[2].moved)
 
-        require = oldReuquire
+        dofile = oldDofile
 
         revertMocks(backup, lfs, nil, io)
     end)

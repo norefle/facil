@@ -67,6 +67,12 @@ File system layout is:
           meta/                   - Description of tasks.
           config                  - Local configuration file.
 ]]
+    elseif "status" == name then
+        print [[
+fl status
+
+Shows current status of all boards with tasks on them.
+]]
     else
         return nil, "Error: invalid command name: '" .. tostring(name) .. "'"
     end
@@ -88,6 +94,23 @@ handler.init = function(rootPath)
     end
 
     return Fl.init(rootPath)
+end
+
+handler.status = function()
+    local board, description = Fl.status()
+    if not board then
+        return nil, description
+    end
+
+    for _, lane in pairs(board) do
+        print("[ " .. #lane.tasks .. " / 0" .. " ] " .. lane.name)
+        for _, task in pairs(lane.tasks) do
+            print(task.moved .. " " .. task.name .. " " .. task.id:sub(1, 8))
+        end
+        print("\n")
+    end
+
+    return true
 end
 
 --- Entry point.

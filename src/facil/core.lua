@@ -228,17 +228,17 @@ function _M.status()
     for laneName in lfs.dir(root .. "/.fl/boards") do
         if "." ~= laneName
             and ".." ~= laneName
-            and "directory" == lfs.attributes(laneName, "mode")
+            and "directory" == lfs.attributes(root .. "/.fl/boards/" .. laneName, "mode")
         then
             -- @todo Sort boards in order of inital -> intermediate -> finish
             --       Get all these information from config file.
             local lane = { name = laneName, tasks = { } }
             local laneRoot = table.concat{root, "/.fl/boards/", laneName}
             for taskId in lfs.dir(laneRoot) do
-                if "file" == lfs.attributes(taskId, "mode") then
+                if "file" == lfs.attributes(laneRoot .. "/" .. taskId, "mode") then
                     local metaFile = table.concat({ root, ".fl", "meta", taskId:sub(1, 2), taskId:sub(3) }, "/")
                     local success, metadata = pcall(
-                        require,
+                        dofile,
                         table.concat({ root, ".fl", "meta", taskId:sub(1, 2), taskId:sub(3) }, "/")
                     )
                     -- @todo Fill task with proper values.
