@@ -12,12 +12,66 @@ local _M = {}
 _M.lfs = FileSystem
 _M.uuid = Uuid
 
---- @brief Finds root directory of fácil.
--- It searched from current directory to its parents up to file system root.
--- If .fl was found either current directory or in parent directory
+--- @brief Returns parent directory for selected one.
+-- @param current Current directory to get its parent.
+-- @return Parent path in success, (nil, string) otherwise.
+function _M.getParent(current)
+    if not current or "string" ~= type(current) then
+        return nil, "Invalid argument: " .. tostring(current)
+    end
+
+    local parent, child = current:match("^(.+)/(.+)/?$")
+    if not parent then
+        return nil, "There is no parent dir for: " .. tostring(current)
+    end
+
+    return parent
+end
+
+--- @brief Returns root directory of fácil.
+--
+-- It searches from current directory to its parents up to file system root.
+-- If .fl was found either within current directory or within parent directory
 -- then it will return full path to directory contained .fl.
 -- Otherwise it will return nil
+--
 -- @return Full path to .fl directory on success, nil otherwise.
+function _M.getRootPath()
+    local pwd = FileSystem.currentdir()
+    if not pwd then
+        return nil
+    end
+
+    local parents = function(directory)
+        local iterator = function(initial, current)
+            if "." == current then
+                return initial
+            elseif not current or "" == current then
+                return nil
+            end
+
+            return _M.getParent(current)
+        end
+
+        return iterator, directory, "."
+    end
+
+    for parent in parents(pwd) do
+        for child in FileSystem.dir(parent) do
+            if "." ~= child
+                and ".." ~= child
+                and "directory" == FileSystem.attributes(table.concat({parent, child}, "/"), "mode")
+            then
+                if ".fl" == child then
+                    return table.concat({parent, child}, "/")
+                end
+            end
+        end
+    end
+
+    return nil
+end
+
 function _M.findFlRoot()
     --- @warning Not implementd yet
     return FileSystem.currentdir()
