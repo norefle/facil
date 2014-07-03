@@ -70,47 +70,36 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
         end
 
         backup.lfs.dir = lfs.dir
-        lfs.dir = function(path, ...)
-            backup.lfs.dir(path, ...)
-            local iterator
-            if path:find("/boards$") then
-                iterator = function(storage, ...)
-                local result = nil
-                    if storage.step == 1 then
-                        storage.step = 2
-                        result = "Backlog"
-                    elseif storage.step == 2 then
-                        storage.step = 3
-                        result = "Progress"
-                    elseif storage.step == 3 then
-                        storage.step = 4
-                        result = "Done"
-                    else
-                        result = nil
-                    end
+        lfs.dir = function(path)
+            backup.lfs.dir(path)
+            local iterator = function(inital, previous)
+                local layout = {
+                    [Helpers.FAKE_ROOT .. "/.fl"] = "boards",
+                    [Helpers.FAKE_ROOT .. "/.fl/boards"] = "backlog",
+                    [Helpers.FAKE_ROOT .. "/.fl/boards/backlog"] = "task_1",
+                    [Helpers.FAKE_ROOT .. "/.fl/boards/progress"] = "task_1",
+                    [Helpers.FAKE_ROOT .. "/.fl/boards/done"] = "task_1",
+                    ["boards"] = "cards",
+                    ["cards"] = "meta",
+                    ["meta"] = nil,
+                    ["backlog"] = "progress",
+                    ["progress"] = "done",
+                    ["done"] = nil,
+                    ["task_1"] = "task_2"
+                }
 
-                    return result
-                end
-            elseif path:find("Backlog$")
-                or path:find("Progress$")
-                or path:find("Done$")
-            then
-                iterator = function(storage, ...)
-                    if storage.step == 1 then
-                        storage.step = 2
-                        result = "task_1"
-                    elseif storage.step == 2 then
-                        storage.step = 3
-                        result = "task_2"
+                if "-" == previous then
+                    if Helpers.FAKE_ROOT == path then
+                        return ".fl"
                     else
-                        result = nil
+                        return layout[path]
                     end
-
-                    return result
+                else
+                    return layout[previous]
                 end
             end
 
-            return iterator, { step = 1 }, "."
+            return iterator, path, "-"
         end
 
         backup.lfs.attributes = lfs.attributes
@@ -120,10 +109,9 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
             if args[2] == "mode" then
                 if args[1]:find("task_") then
                     return "file"
-                elseif args[1]:find("Backlog$")
-                    or args[1]:find("Progress$")
-                    or args[1]:find("Done$")
-                then
+                elseif args[1]:find("meta/") or args[1]:find("cards/") then
+                    return nil
+                else
                     return "directory"
                 end
             end

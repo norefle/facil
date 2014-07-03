@@ -49,7 +49,7 @@ describe("fácil's status command", function()
 
         local board = fl.status()
         assert.is.equal(3, #board)
-        assert.is.equal("Backlog", board[1].name)
+        assert.is.equal("backlog", board[1].name)
 
         revertMocks(backup, lfs, nil, io)
     end)

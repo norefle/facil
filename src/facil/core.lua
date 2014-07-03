@@ -72,22 +72,17 @@ function _M.getRootPath()
     return nil
 end
 
-function _M.findFlRoot()
-    --- @warning Not implementd yet
-    return FileSystem.currentdir()
-end
-
 --- Generates full path inside .fl for card or meta files.
 -- @param root Root folder of file inside .fl ("cards", "meta", "boards") as string.
 -- @param prefix Name of subfolder inside the root as string.
 -- @return string with full path with trailing / on success, nil otherwise
 local function generatePath(root, prefix)
-    local pwd = FileSystem.currentdir()
+    local pwd = _M.getRootPath()
     if not pwd then
         return nil
     end
 
-    local path = { pwd, ".fl" }
+    local path = { pwd }
     if root and "" ~= root then
         path[#path + 1] = root
     end

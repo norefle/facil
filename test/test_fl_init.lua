@@ -62,6 +62,8 @@ describe("fácil's init command", function()
 
     it("creates .fl directory", function()
         local backup = createMocks(lfs, nil, io)
+        lfs.attributes = function() end
+
         local flRoot = ROOT .. "/.fl"
 
         fl.init(ROOT)
@@ -75,6 +77,8 @@ describe("fácil's init command", function()
 
     it("creates .fl/meta and .fl/cards directories", function()
         local backup = createMocks(lfs, nil, io)
+        lfs.attributes = function() end
+
         local meta = ROOT .. "/.fl/meta"
         local cards = ROOT .. "/.fl/cards"
 
@@ -91,6 +95,8 @@ describe("fácil's init command", function()
 
     it("creates all .fl/boards directories", function()
         local backup = createMocks(lfs, nil, io)
+        lfs.attributes = function() end
+
         local boards = ROOT .. "/.fl/boards"
         local backlog = boards .. "/backlog"
         local progress = boards .. "/progress"
