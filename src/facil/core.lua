@@ -6,11 +6,11 @@
 local FileSystem = require "lfs"
 local Uuid = require "uuid"
 
-local Template = {}
-Template.Md = require "facil.template.md"
-Template.Config = require "facil.template.default_config"
-
 local _M = {}
+
+--- @todo Replace these public exposed libraries with wrappers.
+_M.lfs = FileSystem
+_M.uuid = Uuid
 
 --- @brief Finds root directory of fácil.
 -- It searched from current directory to its parents up to file system root.
@@ -18,7 +18,7 @@ local _M = {}
 -- then it will return full path to directory contained .fl.
 -- Otherwise it will return nil
 -- @return Full path to .fl directory on success, nil otherwise.
-local function findFlRoot()
+function _M.findFlRoot()
     --- @warning Not implementd yet
     return FileSystem.currentdir()
 end
@@ -47,7 +47,7 @@ end
 --- Creates directory if doesn't exist.
 -- @param path Path to create directory
 -- @return true on success, false otherwise.
-local function createDir(path)
+function _M.createDir(path)
     return ("directory" == FileSystem.attributes(path, "mode"))
         or FileSystem.mkdir(path)
 end
@@ -60,7 +60,7 @@ end
 -- @param content Content of created file.
 -- @return {path, name} - description of created file on success,
 --         nil, string  - description of error otherwise.
-local function createCardFile(root, prefix, infix, suffix, content)
+function _M.createCardFile(root, prefix, infix, suffix, content)
     local data = {}
 
     data.path = generatePath(root, prefix)
@@ -79,7 +79,7 @@ local function createCardFile(root, prefix, infix, suffix, content)
         data.name = data.name .. suffix
     end
 
-    if not createDir(data.path) then
+    if not _M.createDir(data.path) then
         return nil, "Can't create dir: " .. data.path
     end
 
@@ -98,7 +98,7 @@ end
 -- @param card Card description {name, dat, id}
 -- @todo Use either proper serialization lib or json lib.
 -- @return serialized card as string on success, nil otherwise.
-local function serializeMeta(card)
+function _M.serializeMeta(card)
     if not card or "table" ~= type(card) then
         return nil
     end
@@ -112,152 +112,6 @@ local function serializeMeta(card)
     }
 
     return table.concat(meta, "\n")
-end
-
---- Creates new card
--- @param name Short descriptive name of card.
--- @retval true, string - on success, where string is the uuid of new card.
--- @retval nil, string - on error, where string contains detailed description.
-function _M.create(name)
-    if not name or "string" ~= type(name) then
-        return nil, "Invalid argument."
-    end
-
-    local card = {}
-
-    card.name = name
-    card.id = uuid.new()
-    if not card.id then
-        return nil, "Can't generate uuid for card."
-    end
-
-    card.time = os.time()
-
-    local prefix = card.id:sub(1, 2)
-    local body = card.id:sub(3)
-
-    local markdown, markdownErr
-        = createCardFile("cards", prefix, body, ".md", Template.Md.value)
-    if not markdown then
-        return nil, markdownErr
-    end
-
-    --- @warning Platform (linux specific) dependent code.
-    --- @todo Either replace with something more cross platform
-    ---       or check OS before.
-    os.execute("$EDITOR " .. markdown.name)
-
-    local meta, metaErr
-        = createCardFile("meta", prefix, body, nil, serializeMeta(card))
-    if not meta then
-        return nil, metaErr
-    end
-
-    local marker, markerErr = createCardFile("boards", "backlog", card.id, nil, tostring(card.time))
-    if not marker then
-        return nil, markerErr
-    end
-
-    return true, card.id
-end
-
---- Initialized fácil's file system layout inside selected directory.
--- @param root Path to the root directory, where to initialize fl.
--- @retval true - on success
--- @retval nil, string - on error, where string contains detailed description.
-function _M.init(root)
-    if not root or "string" ~= type(root) then
-        return nil, "Invalid argument."
-    end
-
-    local directories = {
-        root .. "/.fl",
-        root .. "/.fl/boards",
-        root .. "/.fl/boards/backlog",
-        root .. "/.fl/boards/progress",
-        root .. "/.fl/boards/done",
-        root .. "/.fl/cards",
-        root .. "/.fl/meta"
-    }
-
-    for _, path in pairs(directories) do
-        if not createDir(path) then
-            return nil, "Can't create directory: " .. path
-        end
-    end
-
-    local configSuccess, configError =
-        createCardFile("", nil, "config", nil, Template.Config.value)
-    if not configSuccess then
-        return nil, configError
-    end
-
-    return true
-end
-
---- Returns current status of the board with tasks on it.
--- @return Board description.
--- @note Here is the example of returned board:
---      @code
---          board = {
---              -- Lane number 0, with flag initial = true
---              {
---                  name = "Backlog",
---                  tasks = {
---                      -- Array of tasks, ordered by date (asc)
---                      {
---                          name = "Task #1",
---                          id = "aaaa-bbbb-cccc-dddd",
---                          created = 123456789,
---                          moved = 234567890
---                      },
---                      ...
---                  }
---              },
---              ...
---          }
---      @endcode
-function _M.status()
-    local board = {}
-
-    local root = findFlRoot()
-    if not root then
-        return nil, "It's not a fácil board."
-    end
-
-    for laneName in lfs.dir(root .. "/.fl/boards") do
-        if "." ~= laneName
-            and ".." ~= laneName
-            and "directory" == lfs.attributes(root .. "/.fl/boards/" .. laneName, "mode")
-        then
-            -- @todo Sort boards in order of inital -> intermediate -> finish
-            --       Get all these information from config file.
-            local lane = { name = laneName, tasks = { } }
-            local laneRoot = table.concat{root, "/.fl/boards/", laneName}
-            for taskId in lfs.dir(laneRoot) do
-                if "file" == lfs.attributes(laneRoot .. "/" .. taskId, "mode") then
-                    local metaFile = table.concat({ root, ".fl", "meta", taskId:sub(1, 2), taskId:sub(3) }, "/")
-                    local success, metadata = pcall(
-                        dofile,
-                        table.concat({ root, ".fl", "meta", taskId:sub(1, 2), taskId:sub(3) }, "/")
-                    )
-                    -- @todo Fill task with proper values.
-                    if success then
-                        local task = {
-                            id = taskId,
-                            name = metadata.name,
-                            created = metadata.created,
-                            moved = 0
-                        }
-                        lane.tasks[#lane.tasks + 1] = task
-                    end
-                end
-            end
-            board[#board + 1] = lane
-        end
-    end
-
-    return board
 end
 
 return _M

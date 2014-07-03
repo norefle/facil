@@ -3,7 +3,9 @@
 --- @brief Entry point of fácil module.
 ----------------------------------------------------------------------------]]--
 
-local Core = require "facil.core"
+local Create = require "facil.create"
+local Init = require "facil.init"
+local Status = require "facil.status"
 
 local _M = { }
 
@@ -31,7 +33,7 @@ _M.NAME = "fácil"
 --
 -- @retval true - on success
 -- @retval nil, string - on error, where string contains detailed description.
-_M.init = Core.init
+_M.init = Init.init
 
 --- @brief Creates new card
 --
@@ -45,9 +47,9 @@ _M.init = Core.init
 --
 -- @retval true, string - on success, where string is the uuid of new card.
 -- @retval nil, string - on error, where string contains detailed description.
-_M.create = Core.create
+_M.create = Create.create
 
 --- @brief Returns current status of fácil's board.
-_M.status = Core.status
+_M.status = Status.status
 
 return _M

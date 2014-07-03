@@ -36,7 +36,13 @@ describe("fácil's create command", function()
 
     after_each(function()
         -- Unload modules.
-        fl, package.loaded["facil"], package.loaded["facil.core"] = nil, nil, nil
+        fl = nil
+        package.loaded["facil"] = nil
+        package.loaded["facil.core"] = nil
+        package.loaded["facil.create"] = nil
+        package.loaded["facil.init"] = nil
+        package.loaded["facil.status"] = nil
+
         uuid, package.loaded["uuid"] = nil, nil
         lfs, package.loaded["lfs"] = nil, nil
 
