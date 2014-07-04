@@ -72,6 +72,37 @@ function _M.getRootPath()
     return nil
 end
 
+--- Creates path string from parts.
+-- @param (...) subparts of path to generate.
+-- @return  String with full generated path.
+function _M.path(...)
+    function normalize(path)
+        if not path then
+            return path
+        end
+
+        return (path:gsub("\\", "/"):gsub("//", "/"))
+    end
+
+    local path = {}
+
+    for index = 1, select("#", ...), 1 do
+        local argument = select(index, ...)
+        if argument and "string" ~= type(argument) then
+            error("Invalid argument type (expected string): " .. type(argument), 2)
+        end
+        if argument and "" ~= argument then
+            path[#path + 1] = argument
+        end
+    end
+
+    if 0 < #path then
+        return normalize("/" .. table.concat( path, "/" ))
+    else
+        return ""
+    end
+end
+
 --- Generates full path inside .fl for card or meta files.
 -- @param root Root folder of file inside .fl ("cards", "meta", "boards") as string.
 -- @param prefix Name of subfolder inside the root as string.

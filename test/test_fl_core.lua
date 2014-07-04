@@ -111,4 +111,25 @@ describe("fácil", function()
         assert.is.falsy(dir)
         assert.is.equal("There is no parent dir for: /xzy/", descr)
     end)
+
+    it("core module creates path string", function()
+        assert.is.equal("/home/some/path", core.path("home", "some", "path"))
+    end)
+
+    it("core module creates empty path string for empty arguments", function()
+        assert.is.equal("", core.path())
+        assert.is.equal("", core.path(""))
+    end)
+
+    it("core module skips empty arguments in path generation", function()
+        assert.is.equal("/home/some/path", core.path("home", "", "some", "", nil, "path"))
+    end)
+
+    it("core module raises error for non string in path generation", function()
+        assert.has. errors(function() core.path("home", "some", { "error "}, "done" ) end)
+    end)
+
+    it("core module normalizes generated paths", function()
+        assert.is.equal("/home/some/path/here", core.path("\\home\\some", "path/here"))
+    end)
 end)
