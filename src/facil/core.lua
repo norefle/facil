@@ -103,27 +103,6 @@ function _M.path(...)
     end
 end
 
---- Generates full path inside .fl for card or meta files.
--- @param root Root folder of file inside .fl ("cards", "meta", "boards") as string.
--- @param prefix Name of subfolder inside the root as string.
--- @return string with full path with trailing / on success, nil otherwise
-local function generatePath(root, prefix)
-    local pwd = _M.getRootPath()
-    if not pwd then
-        return nil
-    end
-
-    local path = { pwd }
-    if root and "" ~= root then
-        path[#path + 1] = root
-    end
-    if prefix and "" ~= prefix then
-        path[#path + 1] = prefix
-    end
-
-    return table.concat(path, "/")
-end
-
 --- Creates directory if doesn't exist.
 -- @param path Path to create directory
 -- @return true on success, false otherwise.
@@ -143,10 +122,12 @@ end
 function _M.createCardFile(root, prefix, infix, suffix, content)
     local data = {}
 
-    data.path = generatePath(root, prefix)
-    if not data.path then
-        return nil, "Can't generate file name for card."
+    local flRoot = _M.getRootPath()
+    if not flRoot then
+        return nil, "Can't get fácil's root directory."
     end
+
+    data.path = _M.path(flRoot, root, prefix)
 
     local fullName = { data.path }
 

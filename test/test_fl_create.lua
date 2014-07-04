@@ -98,7 +98,7 @@ describe("fácil's create command", function()
 
         local result, description = fl.create("wrong")
         assert.is.equal(result, nil)
-        assert.is.equal("Can't generate file name for card.", description)
+        assert.is.equal("Can't get fácil's root directory.", description)
 
         lfs = unwrap(lfs)
         io = unwrap(io)
