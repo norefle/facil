@@ -37,21 +37,21 @@ function _M.status()
         return nil, "It's not a fácil board."
     end
 
-    for laneName in Core.lfs.dir(root .. "/boards") do
+    for laneName in Core.lfs.dir(Core.path(root, "boards")) do
         if "." ~= laneName
             and ".." ~= laneName
-            and "directory" == Core.lfs.attributes(root .. "/boards/" .. laneName, "mode")
+            and "directory" == Core.lfs.attributes(Core.path(root, "boards", laneName), "mode")
         then
             -- @todo Sort boards in order of inital -> intermediate -> finish
             --       Get all these information from config file.
             local lane = { name = laneName, tasks = { } }
-            local laneRoot = table.concat{root, "/boards/", laneName}
+            local laneRoot = Core.path(root, "boards", laneName)
             for taskId in Core.lfs.dir(laneRoot) do
-                if "file" == Core.lfs.attributes(laneRoot .. "/" .. taskId, "mode") then
-                    local metaFile = table.concat({ root, "meta", taskId:sub(1, 2), taskId:sub(3) }, "/")
+                if "file" == Core.lfs.attributes(Core.path(laneRoot, taskId), "mode") then
+                    local metaFile = Core.path(root, "meta", Core.pathById(taskId))
                     local success, metadata = pcall(
                         dofile,
-                        table.concat({ root, "meta", taskId:sub(1, 2), taskId:sub(3) }, "/")
+                        Core.path(root, "meta", Core.pathById(taskId))
                     )
                     -- @todo Fill task with proper values.
                     if success then
