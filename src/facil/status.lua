@@ -59,7 +59,7 @@ function _M.status()
                             id = taskId,
                             name = metadata.name,
                             created = metadata.created,
-                            moved = 0
+                            moved = Core.movedAt(laneName, taskId) or 0
                         }
                         lane.tasks[#lane.tasks + 1] = task
                     end

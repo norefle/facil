@@ -189,8 +189,8 @@ end
 -- @return number - unix timestamp of the date when task was moved to selected board on success,
 --         nil, string - on error.
 function _M.movedAt(board, id)
-    local taskFileName = _M.path(_M.getRootPath(), board, _M.pathById(id))
-    local taskFile = io.open(taskFileName, "r")
+    local taskFileName = _M.path(_M.getRootPath(), "boards", board, id)
+    local taskFile, err = io.open(taskFileName, "r")
 
     if not taskFile then
         return nil, "There is no requested task."

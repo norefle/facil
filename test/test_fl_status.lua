@@ -80,8 +80,9 @@ describe("fácil's status command", function()
         revertMocks(backup, lfs, nil, io)
     end)
 
-    pending("returns task in ascending order by moving date", function()
+    it("returns task in ascending order by moving date", function()
         local backup = createMocks(lfs, nil, io)
+        io.open = function(...) print(...) end
 
         local oldDofile = dofile
         dofile = function(name)
