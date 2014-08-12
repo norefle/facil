@@ -175,4 +175,31 @@ function _M.serializeMeta(card)
     return table.concat(meta, "\n")
 end
 
+--- Returns path (relative) for selected id.
+-- @param id Full uuid of task.
+-- @return string - path as prefix/postfix generated from id on success.
+--         nil, error - otherwise
+function _M.pathById(id)
+    return _M.path(id:sub(1, 2), id:sub(3))
+end
+
+--- Returns time of moving the task to exact board.
+-- @param board Name of board.
+-- @param id Full task id.
+-- @return number - unix timestamp of the date when task was moved to selected board on success,
+--         nil, string - on error.
+function _M.movedAt(board, id)
+    local taskFileName = _M.path(_M.getRootPath(), board, _M.pathById(id))
+    local taskFile = io.open(taskFileName, "r")
+
+    if not taskFile then
+        return nil, "There is no requested task."
+    end
+
+    local date = taskFile:read("*a")
+    taskFile:close()
+
+    return tonumber(date)
+end
+
 return _M

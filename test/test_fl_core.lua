@@ -132,4 +132,44 @@ describe("fácil", function()
     it("core module normalizes generated paths", function()
         assert.is.equal("/home/some/path/here", core.path("\\home\\some", "path/here"))
     end)
+
+    it("core module generates file subpath by task id", function()
+        assert.is.equal("/aa/aa-bbbb-cccc-dddd", core.pathById("aaaa-bbbb-cccc-dddd"))
+    end)
+
+    it("core module returns move date for task", function()
+        local currentdir = lfs.currentdir
+        local dir = lfs.dir
+        local attributes = lfs.attributes
+        local open = io.open
+
+        lfs.currentdir = function() return "/xyz/current" end
+        lfs.attributes = function() return "directory" end
+        lfs.dir = function()
+            local iterator = function(ignore, previous)
+                if "init" == previous then
+                    return ".git"
+                elseif ".git" == previous then
+                    return ".fl"
+                else
+                    return nil
+                end
+            end
+
+            return iterator, nil, "init"
+        end
+        io.open = function(...)
+            return {
+                read = function(...) return "1234567890" end,
+                close = function(...) end
+            }
+        end
+
+        assert.is.equal(1234567890, core.movedAt("progress", "aaaa-bbbb-cccc-dddd"))
+
+        io.open = open
+        lfs.attributes = attributes
+        lfs.dir = dir
+        lfs.current = currentdir
+    end)
 end)
