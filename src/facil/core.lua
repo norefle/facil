@@ -74,7 +74,7 @@ end
 
 --- Creates path string from parts.
 -- @param (...) subparts of path to generate.
--- @return  String with full generated path.
+-- @return string - generated relative path.
 function _M.path(...)
     function normalize(path)
         if not path then
@@ -97,7 +97,7 @@ function _M.path(...)
     end
 
     if 0 < #path then
-        return normalize("/" .. table.concat( path, "/" ))
+        return normalize(table.concat( path, "/" ))
     else
         return ""
     end

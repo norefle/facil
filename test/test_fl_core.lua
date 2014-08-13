@@ -113,7 +113,7 @@ describe("fácil", function()
     end)
 
     it("core module creates path string", function()
-        assert.is.equal("/home/some/path", core.path("home", "some", "path"))
+        assert.is.equal("home/some/path", core.path("home", "some", "path"))
     end)
 
     it("core module creates empty path string for empty arguments", function()
@@ -122,7 +122,7 @@ describe("fácil", function()
     end)
 
     it("core module skips empty arguments in path generation", function()
-        assert.is.equal("/home/some/path", core.path("home", "", "some", "", nil, "path"))
+        assert.is.equal("home/some/path", core.path("home", "", "some", "", nil, "path"))
     end)
 
     it("core module raises error for non string in path generation", function()
@@ -134,7 +134,7 @@ describe("fácil", function()
     end)
 
     it("core module generates file subpath by task id", function()
-        assert.is.equal("/aa/aa-bbbb-cccc-dddd", core.pathById("aaaa-bbbb-cccc-dddd"))
+        assert.is.equal("aa/aa-bbbb-cccc-dddd", core.pathById("aaaa-bbbb-cccc-dddd"))
     end)
 
     it("core module returns move date for task", function()
