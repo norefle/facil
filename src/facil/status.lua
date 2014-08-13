@@ -17,7 +17,7 @@ local _M = {}
 --                  name = "Backlog",
 --                  -- Work in progress limit (set in config file)
 --                  wip = 12,
---                  -- Board priority (0 means backlog, 100 means done, [1, 99] custom boards)
+--                  -- Board priority (0 - backlog, #board - done, 1 - custom boards)
 --                  priority = 0,
 --                  tasks = {
 --                      -- Array of tasks, ordered by date (asc)
@@ -61,9 +61,16 @@ function _M.status()
         then
             -- @todo Sort boards in order of inital -> intermediate -> finish
             --       Get all these information from config file.
-            local lane = { name = laneName, tasks = { }, wip = 0 }
-            if boardConfig[laneName] and boardConfig[laneName].wip then
-                lane.wip = boardConfig[laneName].wip
+            local lane = { name = laneName, tasks = { }, wip = 0, priority = 1 }
+            if boardConfig[laneName] then
+                if boardConfig[laneName].wip then
+                    lane.wip = boardConfig[laneName].wip
+                end
+                if boardConfig[laneName].initial then
+                    lane.priority = 0
+                elseif boardConfig[laneName].final then
+                    lane.priority = 2
+                end
             end
 
             local laneRoot = Core.path(root, "boards", laneName)
@@ -90,6 +97,19 @@ function _M.status()
             -- Fill the board
             board[#board + 1] = lane
         end
+    end
+
+    if 0 < #board then
+        table.sort(board, function(left, right)
+            local less = false
+            if left.priority == right.priority then
+                less = left.name < right.name
+            else
+                less = left.priority < right.priority
+            end
+            return less
+        end)
+        board[#board].priority = #board
     end
 
     return board

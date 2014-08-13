@@ -59,7 +59,7 @@ _M.create = Create.create
 --                  name = "Backlog",
 --                  -- Work in progress limit (set in config file)
 --                  wip = 12,
---                  -- Board priority (0 means backlog, 100 means done, [1, 99] custom boards)
+--                  -- Board priority (0 - backlog, #board - done, 1 - custom boards)
 --                  priority = 0,
 --                  tasks = {
 --                      -- Array of tasks, ordered by date (asc)

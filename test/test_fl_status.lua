@@ -104,4 +104,19 @@ describe("fácil's status command", function()
 
         revertMocks(backup, lfs, nil, io)
     end)
+
+    it("returns boards in order of priority", function()
+        local backup = createMocks(lfs, nil, io)
+
+        local board = fl.status()
+
+        assert.is.equal("backlog", board[1].name)
+        assert.is.equal(0, board[1].priority)
+        assert.is.equal("progress", board[2].name)
+        assert.is.equal(1, board[2].priority)
+        assert.is.equal("done", board[3].name)
+        assert.is.equal(3, board[3].priority)
+
+        revertMocks(backup, lfs, nil, io)
+    end)
 end)

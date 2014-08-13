@@ -83,9 +83,9 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
                     ["boards"] = "cards",
                     ["cards"] = "meta",
                     ["meta"] = nil,
-                    ["backlog"] = "progress",
-                    ["progress"] = "done",
-                    ["done"] = nil,
+                    ["backlog"] = "done",
+                    ["progress"] = nil,
+                    ["done"] = "progress",
                     ["task_1"] = "task_2"
                 }
 
