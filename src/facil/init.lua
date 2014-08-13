@@ -34,8 +34,7 @@ function _M.init(root)
         end
     end
 
-    local configSuccess, configError =
-        Core.createCardFile("", nil, "config", nil, Template.value)
+    local configSuccess, configError = Core.createConfig(root, Template.value)
     if not configSuccess then
         return nil, configError
     end

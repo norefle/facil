@@ -89,7 +89,9 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
                 }
 
                 if "-" == previous then
-                    if Helpers.FAKE_ROOT == path then
+                    if Helpers.FAKE_ROOT == path
+                        or Helpers.FAKE_ROOT .."/child_to_init_at" == path
+                    then
                         return ".fl"
                     else
                         return layout[path]

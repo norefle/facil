@@ -30,14 +30,17 @@ end
 
 --- @brief Returns root directory of fácil.
 --
--- It searches from current directory to its parents up to file system root.
+-- @param root Root directory to start search from (optional).
+--
+-- It searches from root or from current directory (in case if root was nil)
+-- to its parents up to file system root.
 -- If .fl was found either within current directory or within parent directory
 -- then it will return full path to directory contained .fl.
 -- Otherwise it will return nil
 --
 -- @return Full path to .fl directory on success, nil otherwise.
-function _M.getRootPath()
-    local pwd = FileSystem.currentdir()
+function _M.getRootPath(root)
+    local pwd = root or FileSystem.currentdir()
     if not pwd then
         return nil
     end
@@ -153,6 +156,29 @@ function _M.createCardFile(root, prefix, infix, suffix, content)
     file:close()
 
     return data
+end
+
+--- Creates configuration file.
+-- @param root Root directory to start looking for .fl (optional)
+-- @param content Content of the config file.
+-- @return true, string - success code and full config file name.
+--         nil, string - failure code and error description.
+function _M.createConfig(root, content)
+    local flRoot = _M.getRootPath(root)
+    if not flRoot then
+        return nil, "Can't get fácil's root directory."
+    end
+
+    local fileName = _M.path(flRoot, "config")
+    local file = io.open(fileName, "w")
+    if not file then
+        return nil, "Can't create file: " .. tostring(fileName)
+    end
+
+    file:write(content)
+    file:close()
+
+    return true, fileName
 end
 
 --- Serializes lua card table to meta file format.

@@ -142,4 +142,16 @@ describe("fácil's init command", function()
 
         revertMocks(backup, lfs, nil, io, nil)
     end)
+
+    it("uses path instead of current directory", function()
+        local backup = createMocks(lfs, nil, io)
+
+        fl.init(ROOT .. "/child_to_init_at")
+        restoreBackup(backup, nil, nil, io)
+
+        assert.stub(io.open).was.called()
+        assert.stub(io.open).was.called_with(ROOT .. "/child_to_init_at/.fl/config", "w")
+
+        revertMocks(backup, lfs, nil, io)
+    end)
 end)

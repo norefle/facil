@@ -46,7 +46,8 @@ function _M.create(name)
         return nil, metaErr
     end
 
-    local marker, markerErr = Core.createCardFile("boards", "backlog", card.id, nil, tostring(card.time))
+    local marker, markerErr
+        = Core.createCardFile("boards", "backlog", card.id, nil, tostring(card.time))
     if not marker then
         return nil, markerErr
     end
