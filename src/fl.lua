@@ -104,9 +104,23 @@ handler.status = function()
     end
 
     for _, lane in pairs(board) do
-        print("[ " .. #lane.tasks .. " / 0" .. " ] " .. lane.name)
+        io.stdout:write(
+            string.format(
+                "[ %3d | %3d ] %s\n",
+                #lane.tasks,
+                0,
+                lane.name
+            )
+        )
         for _, task in pairs(lane.tasks) do
-            print(task.moved .. " " .. task.name .. " " .. task.id:sub(1, 8))
+            io.stdout:write(
+                string.format(
+                    "%s %s (%s)\n",
+                    os.date("%d.%m.%Y", task.moved),
+                    task.name,
+                    task.id:sub(1, 8)
+                )
+            )
         end
         print("\n")
     end
