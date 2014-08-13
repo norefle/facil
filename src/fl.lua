@@ -38,6 +38,7 @@ List of commands:
     help [NAME]       Prints either common or detailed help for command 'name'
     init ROOT         Initializes fácil within 'root' directory.
     create NAME       Creates new card with selected name.
+    status            Shows current status of board with tasks.
 ]]
     elseif "create" == name then
         print [[

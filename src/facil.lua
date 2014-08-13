@@ -49,7 +49,28 @@ _M.init = Init.init
 -- @retval nil, string - on error, where string contains detailed description.
 _M.create = Create.create
 
---- @brief Returns current status of fácil's board.
+--- @brief Returns current status of fácil's board with tasks on it.
+-- @return Board description.
+-- @note Here is the example of returned board:
+--      @code
+--          board = {
+--              -- Lane number 0, with flag initial = true
+--              {
+--                  name = "Backlog",
+--                  tasks = {
+--                      -- Array of tasks, ordered by date (asc)
+--                      {
+--                          name = "Task #1",
+--                          id = "aaaa-bbbb-cccc-dddd",
+--                          created = 123456789,
+--                          moved = 234567890
+--                      },
+--                      ...
+--                  }
+--              },
+--              ...
+--          }
+--      @endcode
 _M.status = Status.status
 
 return _M
