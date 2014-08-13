@@ -82,7 +82,18 @@ describe("fácil's status command", function()
 
     it("returns task in ascending order by moving date", function()
         local backup = createMocks(lfs, nil, io)
-        io.open = function(...) print(...) end
+        io.open = function(file, type)
+            local time = 17
+            if file:find("task_2") then
+                time = 13
+            elseif file:find("task_1") then
+                time = 456
+            end
+            return {
+                read = function(...) return tostring(time) end,
+                close = function(...) end
+            }
+        end
 
         local oldDofile = dofile
         dofile = function(name)

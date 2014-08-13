@@ -65,6 +65,13 @@ function _M.status()
                     end
                 end
             end
+            -- Sort Task by moving timestamp
+            if 0 < #lane.tasks then
+                table.sort(lane.tasks, function(left, right)
+                    return left.moved < right.moved
+                end)
+            end
+            -- Fill the board
             board[#board + 1] = lane
         end
     end
