@@ -175,12 +175,19 @@ function _M.serializeMeta(card)
     return table.concat(meta, "\n")
 end
 
+--- Splits task id into two component.
+-- @param id Full uuid
+-- @return string, string - prefix and postfix of id.
+function _M.splitId(id)
+    return id:sub(1, 2), id:sub(3)
+end
+
 --- Returns path (relative) for selected id.
 -- @param id Full uuid of task.
 -- @return string - path as prefix/postfix generated from id on success.
 --         nil, error - otherwise
 function _M.pathById(id)
-    return _M.path(id:sub(1, 2), id:sub(3))
+    return _M.path(_M.splitId(id))
 end
 
 --- Returns time of moving the task to exact board.

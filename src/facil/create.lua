@@ -28,9 +28,7 @@ function _M.create(name)
 
     card.time = os.time()
 
-    local prefix = card.id:sub(1, 2)
-    local body = card.id:sub(3)
-
+    local prefix, body = Core.splitId(card.id)
     local markdown, markdownErr
         = Core.createCardFile("cards", prefix, body, ".md", Template.value)
     if not markdown then
