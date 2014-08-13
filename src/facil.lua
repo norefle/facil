@@ -49,7 +49,7 @@ _M.init = Init.init
 -- @retval nil, string - on error, where string contains detailed description.
 _M.create = Create.create
 
---- @brief Returns current status of fácil's board with tasks on it.
+--- Returns current status of the board with tasks on it.
 -- @return Board description.
 -- @note Here is the example of returned board:
 --      @code
@@ -57,6 +57,10 @@ _M.create = Create.create
 --              -- Lane number 0, with flag initial = true
 --              {
 --                  name = "Backlog",
+--                  -- Work in progress limit (set in config file)
+--                  wip = 12,
+--                  -- Board priority (0 means backlog, 100 means done, [1, 99] custom boards)
+--                  priority = 0,
 --                  tasks = {
 --                      -- Array of tasks, ordered by date (asc)
 --                      {

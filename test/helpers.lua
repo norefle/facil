@@ -53,6 +53,7 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
     backup.lfs = {}
     backup.uuid = {}
     backup.io = {}
+    backup.dofile = dofile
 
     if lfs then
         lfs = mock(lfs, true)
@@ -169,6 +170,31 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
         end
     end
 
+    dofile = function(file)
+        if Helpers.FAKE_ROOT .. "/.fl/meta/ta/sk_1" == file then
+            return {
+                id = file,
+                name = "Task #1",
+                created = 123
+            }
+
+        elseif Helpers.FAKE_ROOT .. "/.fl/meta/ta/sk_2" == file then
+            return {
+                id = file,
+                name = "Task #2",
+                created = 12
+            }
+        elseif Helpers.FAKE_ROOT .. "/.fl/config" == file then
+            return {
+                boards = {
+                    { name = "backlog", wip = 0, initial = true },
+                    { name = "progress", wip = 12 },
+                    { name = "done", wip = 0, final = true }
+                }
+            }
+        end
+    end
+
     return backup
 end
 
@@ -195,6 +221,8 @@ function Helpers.restoreBackup(backup, lfs, uuid, io, os)
         lfs.mkdir = backup.lfs.mkdir
         lfs.currentdir = backup.lfs.currentdir
     end
+
+    dofile = backup.dofile
 end
 
 --- Reverts changes made by createMocks.

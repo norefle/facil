@@ -235,4 +235,21 @@ function _M.movedAt(board, id)
     return tonumber(date)
 end
 
+--- Reads metadata of card.
+-- @param root Root directory of (.fl)
+-- @param id Task id to read its metadata.
+-- @return true, {} - success, metadata on success.
+--         false, string - failure, error description on error.
+function _M.readMetadata(root, id)
+    return pcall(dofile, _M.path(root, "meta", _M.pathById(id)))
+end
+
+--- Returns configuration of the fácil.
+-- @param root Path to .fl
+-- @return true, {} - success, configuration on success
+--         false, string - failure, error description on error.
+function _M.getConfig(root)
+    return pcall(dofile, _M.path(root, "config"))
+end
+
 return _M

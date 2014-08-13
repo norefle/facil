@@ -47,7 +47,7 @@ describe("fácil's status command", function()
     it("returns board with lanes as array", function()
         local backup = createMocks(lfs, nil, io)
 
-        local board = fl.status()
+        local board, err = fl.status()
         assert.is.equal(3, #board)
         assert.is.equal("backlog", board[1].name)
 
@@ -57,31 +57,18 @@ describe("fácil's status command", function()
     it("returns tasks per lane", function()
         local backup = createMocks(lfs, nil, io)
 
-        local oldDofile = require
-        dofile = function(name)
-            if name then
-                return {
-                    id = name,
-                    name = "Task #1",
-                    created = 123
-                }
-            else
-                return oldDofile(name)
-            end
-        end
-
         local board = fl.status()
+
         assert.is.equal("table", type(board[1].tasks))
         assert.is.equal(2, #board[1].tasks)
         assert.is.equal("Task #1", board[1].tasks[1].name)
-
-        dofile = oldDofile
 
         revertMocks(backup, lfs, nil, io)
     end)
 
     it("returns task in ascending order by moving date", function()
         local backup = createMocks(lfs, nil, io)
+        local oldOpen = io.open
         io.open = function(file, type)
             local time = 17
             if file:find("task_2") then
@@ -95,33 +82,25 @@ describe("fácil's status command", function()
             }
         end
 
-        local oldDofile = dofile
-        dofile = function(name)
-            if "/xyz/.fl/meta/ta/sk_1" == name then
-                return {
-                    id = name,
-                    name = "Task #1",
-                    created = 123
-                }
-
-            elseif "/xyz/.fl/meta/ta/sk_2" == name then
-                return {
-                    id = name,
-                    name = "Task #2",
-                    created = 12
-                }
-            else
-                return oldDofile(name)
-            end
-        end
-
         local board = fl.status()
+
         assert.is.equal("table", type(board[1].tasks))
         assert.is.equal(2, #board[1].tasks)
         assert.is.equal(13, board[1].tasks[1].moved)
         assert.is.equal(456, board[1].tasks[2].moved)
 
-        dofile = oldDofile
+        io.open = oldOpen
+
+        revertMocks(backup, lfs, nil, io)
+    end)
+
+    it("returns valid WIP for board", function()
+        local backup = createMocks(lfs, nil, io)
+
+        local board = fl.status()
+
+        assert.is.equal("progress", board[2].name)
+        assert.is.equal(12, board[2].wip)
 
         revertMocks(backup, lfs, nil, io)
     end)

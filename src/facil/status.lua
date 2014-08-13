@@ -15,6 +15,10 @@ local _M = {}
 --              -- Lane number 0, with flag initial = true
 --              {
 --                  name = "Backlog",
+--                  -- Work in progress limit (set in config file)
+--                  wip = 12,
+--                  -- Board priority (0 means backlog, 100 means done, [1, 99] custom boards)
+--                  priority = 0,
 --                  tasks = {
 --                      -- Array of tasks, ordered by date (asc)
 --                      {
@@ -37,6 +41,19 @@ function _M.status()
         return nil, "It's not a fácil board."
     end
 
+    local hasConfig, config = Core.getConfig(root)
+    if not hasConfig then
+        return nil, config
+    end
+
+    local boardConfig = {}
+    config.boards = config.boards or {}
+    for _, v in pairs(config.boards) do
+        if v.name then
+            boardConfig[v.name] = v
+        end
+    end
+
     for laneName in Core.lfs.dir(Core.path(root, "boards")) do
         if "." ~= laneName
             and ".." ~= laneName
@@ -44,16 +61,15 @@ function _M.status()
         then
             -- @todo Sort boards in order of inital -> intermediate -> finish
             --       Get all these information from config file.
-            local lane = { name = laneName, tasks = { } }
+            local lane = { name = laneName, tasks = { }, wip = 0 }
+            if boardConfig[laneName] and boardConfig[laneName].wip then
+                lane.wip = boardConfig[laneName].wip
+            end
+
             local laneRoot = Core.path(root, "boards", laneName)
             for taskId in Core.lfs.dir(laneRoot) do
                 if "file" == Core.lfs.attributes(Core.path(laneRoot, taskId), "mode") then
-                    local metaFile = Core.path(root, "meta", Core.pathById(taskId))
-                    local success, metadata = pcall(
-                        dofile,
-                        Core.path(root, "meta", Core.pathById(taskId))
-                    )
-                    -- @todo Fill task with proper values.
+                    local success, metadata = Core.readMetadata(root, taskId)
                     if success then
                         local task = {
                             id = taskId,

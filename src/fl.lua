@@ -108,7 +108,7 @@ handler.status = function()
             string.format(
                 "[ %3d | %3d ] %s\n",
                 #lane.tasks,
-                0,
+                lane.wip,
                 lane.name
             )
         )

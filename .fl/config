@@ -13,7 +13,7 @@ editor = "$EDITOR",
 --   final - closed tasks will be sticked to this board
 boards = {
     { name = "backlog", wip = 0, initial = true },
-    { name = "progress", wip = 0 },
+    { name = "progress", wip = 3 },
     { name = "done", wip = 0, final = true }
 }
 
