@@ -119,4 +119,15 @@ describe("fácil's move command", function()
 
         revertMocks(backup, lfs, nil, io, os)
     end)
+
+    it("returns error for moving task in a final board without explicit lane name", function()
+        local backup = createMocks(lfs, nil, io, os)
+
+        local code, description = fl.move("task_done")
+
+        assert.is.equal(nil, code)
+        assert.is.equal("Task is already on final board: done/task_done_1", description)
+
+        revertMocks(backup, lfs, nil, io, os)
+    end)
 end)

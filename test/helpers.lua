@@ -79,7 +79,7 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
                     [Helpers.FAKE_ROOT .. "/.fl/boards"] = "backlog",
                     [Helpers.FAKE_ROOT .. "/.fl/boards/backlog"] = Helpers.FAKE_UUID,
                     [Helpers.FAKE_ROOT .. "/.fl/boards/progress"] = "task_1",
-                    [Helpers.FAKE_ROOT .. "/.fl/boards/done"] = "task_1",
+                    [Helpers.FAKE_ROOT .. "/.fl/boards/done"] = "task_done_1",
                     [Helpers.FAKE_UUID] = "task_1",
                     ["boards"] = "cards",
                     ["cards"] = "meta",
@@ -87,7 +87,8 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
                     ["backlog"] = "done",
                     ["progress"] = nil,
                     ["done"] = "progress",
-                    ["task_1"] = "task_2"
+                    ["task_1"] = "task_2",
+                    ["task_done_1"] = "task_2"
                 }
 
                 if "-" == previous then
@@ -184,12 +185,17 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
                 name = "Task #1",
                 created = 123
             }
-
         elseif Helpers.FAKE_ROOT .. "/.fl/meta/ta/sk_2" == file then
             return {
                 id = file,
                 name = "Task #2",
                 created = 12
+            }
+        elseif Helpers.FAKE_ROOT .. "/.fl/meta/ta/sk_done_1" == file then
+            return {
+                id = file,
+                name = "Unique finished task #1",
+                created = 432
             }
         elseif Helpers.FAKE_ROOT .. "/.fl/config" == file then
             return {

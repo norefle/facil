@@ -64,7 +64,8 @@ function _M.move(id, lane)
     end
 
     if not lane then
-        -- @todo process moving without lane name in case of task in final lane.
+        return nil, "Task is already on final board: "
+                        .. tostring(boards[currentLane].name) .. "/" .. fullId
     end
 
     local from = Core.path(boards[currentLane].path, fullId)
