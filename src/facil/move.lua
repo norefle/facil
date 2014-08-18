@@ -41,10 +41,10 @@ function _M.move(id, lane)
     for laneIndex, lane in pairs(boards) do
         if lane and lane.tasks then
             for _, task in pairs(lane.tasks) do
-                if task.id:match(encode(id) .. ".*") then
+                if task.id:match("^" .. encode(id) .. ".*$") then
                     if found then
                         -- There are two tasks with the same id prefix.
-                        -- @todo Raise the error here.
+                        return nil, "Task id is ambiguous: " .. tostring(id)
                     else
                         found = true
                         currentLane = laneIndex

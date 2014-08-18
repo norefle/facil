@@ -97,4 +97,26 @@ describe("fácil's move command", function()
 
         revertMocks(backup, lfs, nil, io, os)
     end)
+
+    it("returns error on ambiguous partial id", function()
+        local backup = createMocks(lfs, nil, io, os)
+
+        local code, description = fl.move("task")
+
+        assert.is.equal(nil, code)
+        assert.is.equal("Task id is ambiguous: task", description)
+
+        revertMocks(backup, lfs, nil, io, os)
+    end)
+
+    it("uses partial id as prefix only", function()
+        local backup = createMocks(lfs, nil, io, os)
+
+        local code, description = fl.move(TASK_ID:sub(6, 9)) -- bbbb <- infix of aaaa-bbbb-...
+
+        assert.is.equal(nil, code)
+        assert.is.equal("There is no task with id: bbbb", description)
+
+        revertMocks(backup, lfs, nil, io, os)
+    end)
 end)
