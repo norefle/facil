@@ -27,11 +27,11 @@ local function help()
     return [[
 List of commands:
     create NAME       Creates new card with selected name.
-    init ROOT         Initializes fácil within 'root' directory.
     help [NAME]       Prints either common or detailed help for command 'name'.
+    init ROOT         Initializes fácil within 'root' directory.
+    move TASK [LANE]  Moves task further on board.
     status            Shows current status of board with tasks.
-    version           Shows version and exits.
-]]
+    version           Shows version and exits.]]
 end
 
 return {

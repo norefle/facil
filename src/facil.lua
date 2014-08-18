@@ -6,6 +6,7 @@
 local Create = require "facil.create"
 local Init = require "facil.init"
 local Status = require "facil.status"
+local Move = require "facil.move"
 
 local _M = { }
 
@@ -76,5 +77,8 @@ _M.create = Create.create
 --          }
 --      @endcode
 _M.status = Status.status
+
+---
+_M.move = Move.move
 
 return _M

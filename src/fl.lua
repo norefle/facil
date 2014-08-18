@@ -9,6 +9,7 @@ local Fl = {}
 Fl.create = require "fl.create"
 Fl.init = require "fl.init"
 Fl.status = require "fl.status"
+Fl.move = require "fl.move"
 Fl.help = require "fl.help"
 Fl.version = require "fl.version"
 
@@ -25,6 +26,7 @@ Handlers.init = Fl.init.handler
 Handlers.status = Fl.status.handler
 Handlers.help = Fl.help.handler
 Handlers.version = Fl.version.handler
+Handlers.move = Fl.move.handler
 
 local Help = {}
 Help.create = Fl.create.help
@@ -32,6 +34,7 @@ Help.init = Fl.init.help
 Help.status = Fl.status.help
 Help.help = Fl.help.help
 Help.version = Fl.version.help
+Help.move = Fl.move.help
 
 --- Entry point.
 -- @param ... command line arguments passed to cli application.
