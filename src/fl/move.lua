@@ -8,8 +8,8 @@ local Fl = require "facil"
 --- Cli wrapper for fl.move command.
 -- @return true on success
 --         nil, error:string otherwise
-local function move()
-    return Fl.move()
+local function move(id)
+    return Fl.move(id)
 end
 
 --- Returns detailed description (string) help for status command.

@@ -1,4 +1,4 @@
 #!/bin/bash
-
-LUA_PATH="$LUA_PATH;$(pwd)/src/?.lua;$(pwd)/src/?/init.lua" lua src/fl.lua "$@"
+PWD=$(dirname "$0")
+LUA_PATH="$LUA_PATH;$PWD/src/?.lua;$PWD/src/?/init.lua" lua "$PWD/src/fl.lua" "$@"
 

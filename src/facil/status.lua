@@ -19,8 +19,10 @@ local _M = {}
 --                  wip = 12,
 --                  -- Board priority (0 - backlog, #board - done, 1 - custom boards)
 --                  priority = 0,
+--                  -- Full path to lane
+--                  path = /some/path/to/.fl/boards/Backlog,
+--                  -- Array of tasks, ordered by date (asc)
 --                  tasks = {
---                      -- Array of tasks, ordered by date (asc)
 --                      {
 --                          name = "Task #1",
 --                          id = "aaaa-bbbb-cccc-dddd",
@@ -55,13 +57,20 @@ function _M.status()
     end
 
     for laneName in Core.lfs.dir(Core.path(root, "boards")) do
+        local lanePath = Core.path(root, "boards", laneName)
         if "." ~= laneName
             and ".." ~= laneName
-            and "directory" == Core.lfs.attributes(Core.path(root, "boards", laneName), "mode")
+            and "directory" == Core.lfs.attributes(lanePath, "mode")
         then
             -- @todo Sort boards in order of inital -> intermediate -> finish
             --       Get all these information from config file.
-            local lane = { name = laneName, tasks = { }, wip = 0, priority = 1 }
+            local lane = {
+                name = laneName,
+                tasks = { },
+                wip = 0,
+                priority = 1,
+                path = lanePath
+            }
             if boardConfig[laneName] then
                 if boardConfig[laneName].wip then
                     lane.wip = boardConfig[laneName].wip

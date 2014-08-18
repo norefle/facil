@@ -62,8 +62,10 @@ _M.create = Create.create
 --                  wip = 12,
 --                  -- Board priority (0 - backlog, #board - done, 1 - custom boards)
 --                  priority = 0,
+--                  -- Full path to lane
+--                  path = /some/path/to/.fl/boards/Backlog,
+--                  -- Array of tasks, ordered by date (asc)
 --                  tasks = {
---                      -- Array of tasks, ordered by date (asc)
 --                      {
 --                          name = "Task #1",
 --                          id = "aaaa-bbbb-cccc-dddd",

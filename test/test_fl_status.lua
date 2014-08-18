@@ -50,6 +50,7 @@ describe("fácil's status command", function()
         local board, err = fl.status()
         assert.is.equal(3, #board)
         assert.is.equal("backlog", board[1].name)
+        assert.is.equal(ROOT .. "/.fl/boards/backlog", board[1].path)
 
         revertMocks(backup, lfs, nil, io)
     end)

@@ -163,10 +163,16 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
         os = mock(os, true)
         backup.os = backup.os or {}
         backup.os.time = os.time
+        backup.os.rename = os.rename
 
         os.time = function(...)
             backup.os.time(...)
             return Helpers.FAKE_OS_TIME
+        end
+
+        os.rename = function(...)
+            backup.os.rename(...)
+            return true
         end
     end
 
@@ -207,6 +213,7 @@ end
 function Helpers.restoreBackup(backup, lfs, uuid, io, os)
     if os then
         os.time = backup.os.time
+        os.rename = backup.os.rename
     end
 
     if io then
