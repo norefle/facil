@@ -21,6 +21,13 @@ local function replaceBoard(path, board)
     return prefix .. board .. postfix
 end
 
+--- Encode string to be safe for pattern matching.
+-- @param input Input string to encode (string)
+-- @return string - encoded string
+local function encode(input)
+    return input:gsub("%-", "%%%-"):gsub("%*", "%%%*"):gsub("%+", "%%%+"):gsub("%.", "%%%.")
+end
+
 --- Moves card to the next lane.
 function _M.move(id, lane)
     if not id or "string" ~= type(id) or "" == id then
@@ -34,7 +41,7 @@ function _M.move(id, lane)
     for laneIndex, lane in pairs(boards) do
         if lane and lane.tasks then
             for _, task in pairs(lane.tasks) do
-                if task.id:match(id .. ".*") then
+                if task.id:match(encode(id) .. ".*") then
                     if found then
                         -- There are two tasks with the same id prefix.
                         -- @todo Raise the error here.
@@ -65,7 +72,5 @@ function _M.move(id, lane)
 
     return os.rename(from, to)
 end
-
-
 
 return _M

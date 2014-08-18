@@ -67,15 +67,32 @@ describe("fácil's move command", function()
     it("returns success on valid task id without lane name", function()
         local backup = createMocks(lfs, nil, io, os)
 
-        local code, description = fl.move("task_1")
+        local code = fl.move(TASK_ID)
 
         os.rename = backup.os.rename
 
         assert.is.equal(true, code)
         assert.stub(os.rename).was.called()
         assert.stub(os.rename).was.called_with(
-            ROOT .. "/.fl/boards/backlog/" .. "task_1",
-            ROOT .. "/.fl/boards/progress/" .. "task_1"
+            ROOT .. "/.fl/boards/backlog/" .. TASK_ID,
+            ROOT .. "/.fl/boards/progress/" .. TASK_ID
+        )
+
+        revertMocks(backup, lfs, nil, io, os)
+    end)
+
+    it("returns success on valid prefix of task id without lane name", function()
+        local backup = createMocks(lfs, nil, io, os)
+
+        local code = fl.move(TASK_ID:sub(1, 7)) -- aaaa-bb
+
+        os.rename = backup.os.rename
+
+        assert.is.equal(true, code)
+        assert.stub(os.rename).was.called()
+        assert.stub(os.rename).was.called_with(
+            ROOT .. "/.fl/boards/backlog/" .. TASK_ID,
+            ROOT .. "/.fl/boards/progress/" .. TASK_ID
         )
 
         revertMocks(backup, lfs, nil, io, os)

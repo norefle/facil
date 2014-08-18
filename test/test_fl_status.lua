@@ -61,8 +61,8 @@ describe("fácil's status command", function()
         local board = fl.status()
 
         assert.is.equal("table", type(board[1].tasks))
-        assert.is.equal(2, #board[1].tasks)
-        assert.is.equal("Task #1", board[1].tasks[1].name)
+        assert.is.equal(3, #board[1].tasks)
+        assert.is.equal("Task #1", board[1].tasks[2].name)
 
         revertMocks(backup, lfs, nil, io)
     end)
@@ -72,7 +72,9 @@ describe("fácil's status command", function()
         local oldOpen = io.open
         io.open = function(file, type)
             local time = 17
-            if file:find("task_2") then
+            if file:find("aaaa%-bbbb%-cccc%-dddd") then
+                time = 1
+            elseif file:find("task_2") then
                 time = 13
             elseif file:find("task_1") then
                 time = 456
@@ -86,9 +88,10 @@ describe("fácil's status command", function()
         local board = fl.status()
 
         assert.is.equal("table", type(board[1].tasks))
-        assert.is.equal(2, #board[1].tasks)
-        assert.is.equal(13, board[1].tasks[1].moved)
-        assert.is.equal(456, board[1].tasks[2].moved)
+        assert.is.equal(3, #board[1].tasks)
+        assert.is.equal(1, board[1].tasks[1].moved)
+        assert.is.equal(13, board[1].tasks[2].moved)
+        assert.is.equal(456, board[1].tasks[3].moved)
 
         io.open = oldOpen
 

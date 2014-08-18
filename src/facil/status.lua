@@ -90,7 +90,7 @@ function _M.status()
                         local task = {
                             id = taskId,
                             name = metadata.name,
-                            created = metadata.created,
+                            created = tonumber(metadata.created),
                             moved = Core.movedAt(laneName, taskId) or 0
                         }
                         lane.tasks[#lane.tasks + 1] = task
@@ -100,7 +100,7 @@ function _M.status()
             -- Sort Task by moving timestamp
             if 0 < #lane.tasks then
                 table.sort(lane.tasks, function(left, right)
-                    return left.moved < right.moved
+                    return tonumber(left.moved) < tonumber(right.moved)
                 end)
             end
             -- Fill the board
@@ -112,9 +112,9 @@ function _M.status()
         table.sort(board, function(left, right)
             local less = false
             if left.priority == right.priority then
-                less = left.name < right.name
+                less = tonumber(left.name) < tonumber(right.name)
             else
-                less = left.priority < right.priority
+                less = tonumber(left.priority) < tonumber(right.priority)
             end
             return less
         end)

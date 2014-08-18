@@ -77,9 +77,10 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
                 local layout = {
                     [Helpers.FAKE_ROOT .. "/.fl"] = "boards",
                     [Helpers.FAKE_ROOT .. "/.fl/boards"] = "backlog",
-                    [Helpers.FAKE_ROOT .. "/.fl/boards/backlog"] = "task_1",
+                    [Helpers.FAKE_ROOT .. "/.fl/boards/backlog"] = Helpers.FAKE_UUID,
                     [Helpers.FAKE_ROOT .. "/.fl/boards/progress"] = "task_1",
                     [Helpers.FAKE_ROOT .. "/.fl/boards/done"] = "task_1",
+                    [Helpers.FAKE_UUID] = "task_1",
                     ["boards"] = "cards",
                     ["cards"] = "meta",
                     ["meta"] = nil,
@@ -110,7 +111,7 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
             backup.lfs.attributes(...)
             local args = { ... }
             if args[2] == "mode" then
-                if args[1]:find("task_") then
+                if args[1]:find("task_") or args[1]:find("backlog/aaaa%-bbbb%-cccc%-dddd") then
                     return "file"
                 elseif args[1]:find("meta/") or args[1]:find("cards/") then
                     return nil
@@ -197,6 +198,17 @@ function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
                     { name = "progress", wip = 12 },
                     { name = "done", wip = 0, final = true }
                 }
+            }
+        elseif Helpers.FAKE_ROOT
+               .. "/.fl/meta/"
+               .. Helpers.FAKE_UUID_HEAD
+               .. "/"
+               .. Helpers.FAKE_UUID_TAIL == file
+       then
+            return {
+                id = Helpers.FAKE_UUID,
+                name = "Fake task " .. Helpers.FAKE_UUID,
+                created = 1
             }
         end
     end
