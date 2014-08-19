@@ -10,15 +10,17 @@ Syntax:
 
 On "init" fl have to do following:
 
-  (✔) Create root dir: $ROOT/.fl
-  (✔) Create subdirs:
+- (✔) Create root dir: $ROOT/.fl
+- (✔) Create subdirs:
+`````````````````````````````````````````
         $ROOT/.fl/cards
         $ROOT/.fl/meta
         $ROOT/.fl/boards
         $ROOT/.fl/boards/backlog
         $ROOT/.fl/boards/progress
         $ROOT/.fl/boards/done
-  (✔) Create config file with default values: $ROOT/.fl/config
+`````````````````````````````````````````
+- (✔) Create config file with default values: $ROOT/.fl/config
 
 ## Acceptance criteria
 
