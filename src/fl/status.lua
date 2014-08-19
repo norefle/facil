@@ -14,7 +14,13 @@ local function status()
         return nil, description
     end
 
+    local first = true
     for _, lane in pairs(board) do
+        if not first then
+            io.stdout:write("\n")
+        else
+            first = false
+        end
         io.stdout:write(
             string.format(
                 "[ %3d | %3d ] %s\n",
@@ -33,7 +39,6 @@ local function status()
                 )
             )
         end
-        print("\n")
     end
 
     return true
