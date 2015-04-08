@@ -17,7 +17,7 @@ Fl.version = require "fl.version"
 local function configureOptions(options)
     Options:set_name("fl")
     Options:add_argument("COMMAND", "command to execute.")
-    Options:optarg("ARGS", "command dependent arguments.")
+    Options:optarg("ARGS", "command dependent arguments.", "")
 end
 
 local Handlers = {}

@@ -32,7 +32,7 @@ and still in a heavy development phase.
 
 # Dependencies
 
-* [cli_args](https://github.com/amireh/lua_cliargs) for fl cli application.
-* [luuid](http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#luuid) for task id generation.
-* [luafilesystem](http://keplerproject.github.io/luafilesystem/) for file system routines.
-* [busted](http://olivinelabs.com/busted/) for unit tests.
+* [cli_args 2.5-1](https://github.com/amireh/lua_cliargs) for fl cli application.
+* [luuid 20101118-1](http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#luuid) for task id generation.
+* [luafilesystem 1.6.2-2](http://keplerproject.github.io/luafilesystem/) for file system routines.
+* [busted 2.0.rc7-0](http://olivinelabs.com/busted/) for unit tests.

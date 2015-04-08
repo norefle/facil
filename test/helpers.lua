@@ -48,7 +48,7 @@ end
 -- @param os Origin table for os module. (optional)
 -- @param fileHistory Table for saving history of file operations. (optional)
 -- @return Backup table for using in restore method.
-function Helpers.createMocks(lfs, uuid, io, os, fileHistory)
+function Helpers.createMocks(mock, lfs, uuid, io, os, fileHistory)
     local backup = {}
     backup.lfs = {}
     backup.uuid = {}

@@ -6,7 +6,7 @@
 local Helpers = require "test.helpers"
 
 local unwrap = Helpers.unwrap
-local createMocks = Helpers.createMocks
+local createMocks = function(...) return Helpers.createMocks(mock, ...) end
 local unwrap = Helpers.unwrap
 local restoreBackup = Helpers.restoreBackup
 local revertMocks = Helpers.revertMocks
