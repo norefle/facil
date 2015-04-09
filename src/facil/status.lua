@@ -112,7 +112,7 @@ function _M.status()
         table.sort(board, function(left, right)
             local less = false
             if left.priority == right.priority then
-                less = tonumber(left.name) < tonumber(right.name)
+                less = left.name < right.name
             else
                 less = tonumber(left.priority) < tonumber(right.priority)
             end

@@ -1,0 +1,5 @@
+return {
+    id = "b3c0f8a1-e0d7-4c9a-9d2a-514a36e7838c",
+    name = "Bug: change of board name in config.",
+    created = 1428599144
+}
