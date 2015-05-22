@@ -1,4 +1,16 @@
 #!/bin/bash
-PWD=$(dirname "$0")
-LUA_PATH="$LUA_PATH;$PWD/src/?.lua;$PWD/src/?/init.lua" lua "$PWD/src/fl.lua" "$@"
 
+# \todo Replace fl script with proper binary.
+
+# Workaround to use fl locally.
+# Just copy this script to some place accessible from PATH
+# and replcase PWD with the full path to facil.git root dir.
+
+# Set up lua dirs to support luarocks.
+$(luarocks path)
+
+# Replace this variable with the proper address.
+PWD=$(dirname "$0")
+
+# Call facil.
+LUA_PATH="$LUA_PATH;$PWD/src/?.lua;$PWD/src/?/init.lua" lua "$PWD/src/fl.lua" "$@"
