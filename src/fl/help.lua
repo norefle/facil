@@ -8,7 +8,7 @@
 -- @param dictionary Table with help topics { ["topic"] = function() return description:string end }
 -- @return true on success
 --         nil, error:string otherwise
-local function showHelp(topic, dictionary)
+local function showHelp(topic, _, dictionary)
     assert(nil ~= dictionary and "table" == type(dictionary))
 
     if not topic or "" == topic or "string" ~= type(topic) then

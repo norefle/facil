@@ -29,7 +29,7 @@ local function encode(input)
 end
 
 --- Moves card to the next lane.
-function _M.move(id, lane)
+function _M.move(id, laneName)
     if not id or "string" ~= type(id) or "" == id then
         return nil, "Invalid task id: " .. tostring(id)
     end
@@ -59,17 +59,17 @@ function _M.move(id, lane)
         return nil, "There is no task with id: " .. tostring(id)
     end
 
-    if not lane and currentLane < #boards then
-        lane = boards[currentLane + 1].name
+    if not laneName and currentLane < #boards then
+        laneName = boards[currentLane + 1].name
     end
 
-    if not lane then
+    if not laneName then
         return nil, "Task is already on final board: "
                         .. tostring(boards[currentLane].name) .. "/" .. fullId
     end
 
     local from = Core.path(boards[currentLane].path, fullId)
-    local to = replaceBoard(from, lane)
+    local to = replaceBoard(from, laneName)
 
     return os.rename(from, to)
 end

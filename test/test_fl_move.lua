@@ -130,4 +130,21 @@ describe("fácil's move command", function()
 
         revertMocks(backup, lfs, nil, io, os)
     end)
+
+    it("moves task to the existed lane by its name", function()
+        local backup = createMocks(lfs, nil, io, os)
+
+        local code, description = fl.move("task_done_1", "backlog")
+
+        os.rename = backup.os.rename
+
+        assert.is.equal(true, code)
+        assert.stub(os.rename).was.called()
+        assert.stub(os.rename).was.called_with(
+            ROOT .. "/.fl/boards/done/task_done_1",
+            ROOT .. "/.fl/boards/backlog/task_done_1"
+        )
+
+        revertMocks(backup, lfs, nil, io, os)
+    end)
 end)

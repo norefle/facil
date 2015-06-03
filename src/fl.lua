@@ -17,7 +17,7 @@ Fl.version = require "fl.version"
 local function configureOptions(options)
     Options:set_name("fl")
     Options:add_argument("COMMAND", "command to execute.")
-    Options:optarg("ARGS", "command dependent arguments.", "")
+    Options:optarg("ARGS", "command dependent arguments.", "", 2)
 end
 
 local Handlers = {}
@@ -53,7 +53,7 @@ local function main(...)
                 print("Invalid command: " .. command)
                 return
             end
-            local code, description = Handlers[command](arguments.ARGS, Help)
+            local code, description = Handlers[command](arguments.ARGS[1], arguments.ARGS[2], Help)
             if not code then
                 print(usage)
                 print(description)
