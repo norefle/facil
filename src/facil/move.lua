@@ -59,11 +59,13 @@ function _M.move(id, laneName)
         return nil, "There is no task with id: " .. tostring(id)
     end
 
+    local toIndex
     if laneName then
         local laneExists = false
-        for _, lane in pairs(boards) do
+        for index, lane in pairs(boards) do
             if lane.name == laneName then
                 laneExists = true
+                toIndex = index
                 break
             end
         end
@@ -71,12 +73,18 @@ function _M.move(id, laneName)
             return nil, "There is no lane with the name '" .. laneName .."'"
         end
     elseif not laneName and currentLane < #boards then
-        laneName = boards[currentLane + 1].name
+        toIndex = currentLane + 1
+        laneName = boards[toIndex].name
     end
 
     if not laneName then
         return nil, "Task is already on final board: "
                         .. tostring(boards[currentLane].name) .. "/" .. fullId
+    end
+
+    local toLane = boards[toIndex]
+    if toLane.wip == #toLane.tasks then
+        return nil, "Lane '" .. toLane.name .. "' is already full: " .. tonumber(toLane.wip)
     end
 
     local from = Core.path(boards[currentLane].path, fullId)

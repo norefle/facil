@@ -148,13 +148,24 @@ describe("fácil's move command", function()
         revertMocks(backup, lfs, nil, io, os)
     end)
 
-    it("returns error for moving task to non existed board", function()
-                local backup = createMocks(lfs, nil, io, os)
+    it("returns error for moving task to non existed lane", function()
+        local backup = createMocks(lfs, nil, io, os)
 
         local code, description = fl.move("task_done_1", "noway")
 
         assert.is.equal(nil, code)
         assert.is.equal("There is no lane with the name 'noway'", description)
+
+        revertMocks(backup, lfs, nil, io, os)
+    end)
+
+    it("returns error for moving task to lane with full WIP", function()
+        local backup = createMocks(lfs, nil, io, os)
+
+        local code, description = fl.move(TASK_ID, "done")
+
+        assert.is.equal(nil, code)
+        assert.is.equal("Lane 'done' is already full: 2", description)
 
         revertMocks(backup, lfs, nil, io, os)
     end)

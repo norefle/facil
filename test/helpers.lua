@@ -202,7 +202,7 @@ function Helpers.createMocks(mock, lfs, uuid, io, os, fileHistory)
                 boards = {
                     { name = "backlog", wip = 0, initial = true },
                     { name = "progress", wip = 12 },
-                    { name = "done", wip = 0, final = true }
+                    { name = "done", wip = 2, final = true }
                 }
             }
         elseif Helpers.FAKE_ROOT
