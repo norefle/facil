@@ -83,7 +83,7 @@ function _M.move(id, laneName)
     end
 
     local toLane = boards[toIndex]
-    if toLane.wip == #toLane.tasks then
+    if 0 < toLane.wip and toLane.wip == #toLane.tasks then
         return nil, "Lane '" .. toLane.name .. "' is already full: " .. tonumber(toLane.wip)
     end
 
