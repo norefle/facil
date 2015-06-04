@@ -147,4 +147,15 @@ describe("fácil's move command", function()
 
         revertMocks(backup, lfs, nil, io, os)
     end)
+
+    it("returns error for moving task to non existed board", function()
+                local backup = createMocks(lfs, nil, io, os)
+
+        local code, description = fl.move("task_done_1", "noway")
+
+        assert.is.equal(nil, code)
+        assert.is.equal("There is no lane with the name 'noway'", description)
+
+        revertMocks(backup, lfs, nil, io, os)
+    end)
 end)

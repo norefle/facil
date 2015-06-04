@@ -59,7 +59,18 @@ function _M.move(id, laneName)
         return nil, "There is no task with id: " .. tostring(id)
     end
 
-    if not laneName and currentLane < #boards then
+    if laneName then
+        local laneExists = false
+        for _, lane in pairs(boards) do
+            if lane.name == laneName then
+                laneExists = true
+                break
+            end
+        end
+        if not laneExists then
+            return nil, "There is no lane with the name '" .. laneName .."'"
+        end
+    elseif not laneName and currentLane < #boards then
         laneName = boards[currentLane + 1].name
     end
 
