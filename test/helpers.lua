@@ -205,6 +205,23 @@ function Helpers.createMocks(mock, lfs, uuid, io, os, fileHistory)
                     { name = "done", wip = 2, final = true }
                 }
             }
+        elseif Helpers.FAKE_ROOT .. "/.fl/template/md.lua" == file then
+            return {
+                name = "Template.Markdown",
+                version = "0.0.1",
+                value = [[
+# ${NAME}
+
+## Description
+
+${DESCRITPION}
+
+## Acceptance criteria
+
+${ACCEPTANCE_LIST}
+
+]]
+            }
         elseif Helpers.FAKE_ROOT
                .. "/.fl/meta/"
                .. Helpers.FAKE_UUID_HEAD

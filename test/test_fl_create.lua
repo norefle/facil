@@ -124,14 +124,15 @@ describe("fácil's create command", function()
         local fileHistory = {}
         local backup = createMocks(lfs, uuid, io, os, fileHistory)
 
-        fl.create("markdown test card")
+        local taskName = "markdown test card"
+        fl.create(taskName)
 
         local template = require "facil.template.md"
 
         assert.is.not_equal(fileHistory.write, nil)
         assert.is.not_equal(fileHistory.write[1], nil)
         assert.is.not_equal(fileHistory.write[1][1], nil)
-        assert.is.equal(template.value, fileHistory.write[1][1])
+        assert.is.equal(template.value:gsub("${NAME}", taskName), fileHistory.write[1][1])
 
         revertMocks(backup, lfs, uuid, io, os)
     end)

@@ -253,4 +253,18 @@ function _M.getConfig(root)
     return pcall(dofile, _M.path(root, "config"))
 end
 
+--- Return either local or global template file.
+-- @param name The name of the template
+-- @return true, {} - success, template on success.
+--         false, string - failure, error description on error.
+function _M.getTemplate(name)
+    local root = _M.getRootPath()
+    local success, content = pcall(dofile, _M.path(root, "template", name))
+    if not success then
+        success, content = pcall(require, "facil.template." .. name)
+    end
+
+    return success, content
+end
+
 return _M

@@ -43,7 +43,7 @@ function _M.init(root)
         return nil, errorCode
     end
 
-    success, errorCode = Core.createFile(root, Template.task.value, Core.path("template", "task.lua"))
+    success, errorCode = Core.createFile(root, Template.task.value, Core.path("template", "md.lua"))
     if not success then
         return nil, errorCode
     end

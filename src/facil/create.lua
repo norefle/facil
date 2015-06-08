@@ -5,8 +5,6 @@
 
 local Core = require "facil.core"
 
-local Template = require "facil.template.md"
-
 local _M = {}
 
 --- Creates new card
@@ -18,6 +16,10 @@ function _M.create(name)
         return nil, "Invalid argument."
     end
 
+    if not Core.getRootPath() then
+        return nil, "Can't get fácil's root directory."
+    end
+
     local card = {}
 
     card.name = name
@@ -26,11 +28,17 @@ function _M.create(name)
         return nil, "Can't generate uuid for card."
     end
 
+    local templateErr, template = Core.getTemplate("md.lua")
+    if not templateErr then
+        return nil, "Can't read none of template files for task."
+    end
+    template.value = template.value:gsub("${NAME}", name)
+
     card.time = os.time()
 
     local prefix, body = Core.splitId(card.id)
     local markdown, markdownErr
-        = Core.createCardFile("cards", prefix, body, ".md", Template.value)
+        = Core.createCardFile("cards", prefix, body, ".md", template.value)
     if not markdown then
         return nil, markdownErr
     end
