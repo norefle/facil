@@ -154,4 +154,35 @@ describe("fácil's init command", function()
 
         revertMocks(backup, lfs, nil, io)
     end)
+
+    it("creates .fl/template directory", function()
+        local backup = createMocks(lfs, nil, io)
+        lfs.attributes = function() end
+
+        local template = ROOT .. "/.fl/template"
+
+        fl.init(ROOT)
+        restoreBackup(backup, lfs)
+
+        assert.stub(lfs.mkdir).was.called()
+        assert.stub(lfs.mkdir).was.called_with(template)
+
+        revertMocks(backup, lfs, nil, io)
+    end)
+
+    it("create default task template", function()
+        local fileHistory = {}
+        local backup = createMocks(lfs, nil, io, nil, fileHistory)
+
+        local template = require "facil.template.md"
+
+        fl.init(ROOT)
+
+        assert.is.not_equal(nil, fileHistory.write)
+        assert.is.not_equal(nil, fileHistory.write[2], nil)
+        assert.is.not_equal(nil, fileHistory.write[2][1], nil)
+        assert.is.equal(template.value, fileHistory.write[2][1])
+
+        revertMocks(backup, lfs, nil, io, nil)
+    end)
 end)

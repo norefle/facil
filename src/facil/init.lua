@@ -5,7 +5,10 @@
 
 local Core = require "facil.core"
 
-local Template = require "facil.template.default_config"
+local Template = {
+    config = require "facil.template.default_config",
+    task = require "facil.template.md"
+}
 
 local _M = {}
 
@@ -25,7 +28,8 @@ function _M.init(root)
         root .. "/.fl/boards/progress",
         root .. "/.fl/boards/done",
         root .. "/.fl/cards",
-        root .. "/.fl/meta"
+        root .. "/.fl/meta",
+        root .. "/.fl/template"
     }
 
     for _, path in pairs(directories) do
@@ -34,9 +38,14 @@ function _M.init(root)
         end
     end
 
-    local configSuccess, configError = Core.createConfig(root, Template.value)
-    if not configSuccess then
-        return nil, configError
+    local success, errorCode = Core.createFile(root, Template.config.value, "config")
+    if not success then
+        return nil, errorCode
+    end
+
+    success, errorCode = Core.createFile(root, Template.task.value, Core.path("template", "task.lua"))
+    if not success then
+        return nil, errorCode
     end
 
     return true

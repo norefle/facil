@@ -158,18 +158,19 @@ function _M.createCardFile(root, prefix, infix, suffix, content)
     return data
 end
 
---- Creates configuration file.
+--- Creates service file (config or template).
 -- @param root Root directory to start looking for .fl (optional)
 -- @param content Content of the config file.
+-- @param fileName Name of the file.
 -- @return true, string - success code and full config file name.
 --         nil, string - failure code and error description.
-function _M.createConfig(root, content)
+function _M.createFile(root, content, fileName)
     local flRoot = _M.getRootPath(root)
     if not flRoot then
         return nil, "Can't get fácil's root directory."
     end
 
-    local fileName = _M.path(flRoot, "config")
+    fileName = _M.path(flRoot, fileName)
     local file = io.open(fileName, "w")
     if not file then
         return nil, "Can't create file: " .. tostring(fileName)
