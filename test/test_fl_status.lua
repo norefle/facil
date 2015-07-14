@@ -123,4 +123,25 @@ describe("fácil's status command", function()
 
         revertMocks(backup, lfs, nil, io)
     end)
+
+    it("returns valid limit number for board", function()
+        local backup = createMocks(lfs, nil, io)
+
+        local board = fl.status()
+
+        assert.is.equal(10, board[2].limit) -- progress board (see helpers)
+
+        revertMocks(backup, lfs, nil, io)
+    end)
+
+    it("returns 0 limit for both boards without limit and boards with 0 limit", function()
+        local backup = createMocks(lfs, nil, io)
+
+        local board = fl.status()
+
+        assert.is.equal(0, board[1].limit) -- backlog has limit = 0 (see helpers)
+        assert.is.equal(0, board[3].limit) -- done has nil limit (see helpers)
+
+        revertMocks(backup, lfs, nil, io)
+    end)
 end)

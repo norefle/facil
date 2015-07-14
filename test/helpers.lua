@@ -200,8 +200,8 @@ function Helpers.createMocks(mock, lfs, uuid, io, os, fileHistory)
         elseif Helpers.FAKE_ROOT .. "/.fl/config" == file then
             return {
                 boards = {
-                    { name = "backlog", wip = 0, initial = true },
-                    { name = "progress", wip = 12 },
+                    { name = "backlog", wip = 0, limit = 0, initial = true },
+                    { name = "progress", wip = 12, limit = 10 },
                     { name = "done", wip = 2, final = true }
                 }
             }

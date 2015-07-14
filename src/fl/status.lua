@@ -29,7 +29,12 @@ local function status()
                 lane.name
             )
         )
+        local count = 0
+        local limit = lane.limit
         for _, task in pairs(lane.tasks) do
+            if limit ~= 0 and limit < count then
+                break
+            end
             io.stdout:write(
                 string.format(
                     "%s %s (%s)\n",
@@ -38,6 +43,7 @@ local function status()
                     task.id:sub(1, 8)
                 )
             )
+            count = count + 1
         end
     end
 

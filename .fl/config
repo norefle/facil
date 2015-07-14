@@ -12,9 +12,9 @@ editor = "$EDITOR",
 --   initial - new tasks will be sticked to this board
 --   final - closed tasks will be sticked to this board
 boards = {
-    { name = "backlog", wip = 0, initial = true },
+    { name = "backlog", wip = 0, limit = 0, initial = true },
     { name = "progress", wip = 3 },
-    { name = "done", wip = 0, final = true }
+    { name = "done", wip = 0, limit = 10, final = true }
 }
 
 }

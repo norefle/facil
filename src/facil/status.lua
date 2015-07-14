@@ -62,18 +62,25 @@ function _M.status()
             and ".." ~= laneName
             and "directory" == Core.lfs.attributes(lanePath, "mode")
         then
-            -- @todo Sort boards in order of inital -> intermediate -> finish
-            --       Get all these information from config file.
+            --- @todo Sort boards in order of inital -> intermediate -> finish
+            --        Get all these information from config file.
             local lane = {
                 name = laneName,
                 tasks = { },
                 wip = 0,
+                limit = 0,
                 priority = 1,
                 path = lanePath
             }
             if boardConfig[laneName] then
+                --- @todo Generalize the following functionality:
+                --        check whether the field is set
+                --        set value of default.
                 if boardConfig[laneName].wip then
                     lane.wip = boardConfig[laneName].wip
+                end
+                if boardConfig[laneName].limit then
+                    lane.limit = boardConfig[laneName].limit
                 end
                 if boardConfig[laneName].initial then
                     lane.priority = 0
