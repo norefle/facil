@@ -8,11 +8,21 @@ local Fl = require "facil"
 --- Cli wrapper for fl.status command.
 -- @return true on success
 --         nil, error:string otherwise
-local function status()
+local function status(option, optionValue)
     local board, description = Fl.status()
     if not board then
         return nil, description
     end
+
+    local hardLimit = 0
+    local showAll = false
+
+    if "--all" == option then
+        showAll = true
+    elseif "--limit" == option and tonumber(optionValue) ~= 0 then
+        hardLimit = tonumber(optionValue)
+    end
+
 
     local first = true
     for _, lane in pairs(board) do
@@ -31,8 +41,15 @@ local function status()
         )
         local count = 0
         local limit = lane.limit
+        if showAll then
+            limit = 0
+        elseif hardLimit ~= 0 then
+            limit = hardLimit
+        end
+
         for _, task in pairs(lane.tasks) do
             if limit ~= 0 and limit < count then
+                io.stdout:write("...\n")
                 break
             end
             io.stdout:write(
