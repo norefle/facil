@@ -70,9 +70,16 @@ end
 --- Returns detailed description (string) help for status command.
 local function help()
         return [[
-fl status
+fl status [--all|--limit NUMBER]
 
 Shows current status of all boards with tasks on them.
+Output of the command could be suppressed by the limit
+property for every board either in config file or by
+command line argument.
+
+Options:
+    --all           Forces to shows all tasks.
+    --limit NUMBER  Forces to limits output per board.
 ]]
 end
 
