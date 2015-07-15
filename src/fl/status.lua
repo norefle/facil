@@ -49,7 +49,12 @@ local function status(option, optionValue)
 
         for _, task in pairs(lane.tasks) do
             if limit ~= 0 and limit < count then
-                io.stdout:write("...\n")
+                local remaining = #lane.tasks - count
+                io.stdout:write(string.format(
+                    "... %d more ...\n",
+                    remaining
+                    )
+                )
                 break
             end
             io.stdout:write(
