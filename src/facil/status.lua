@@ -35,10 +35,10 @@ local _M = {}
 --              ...
 --          }
 --      @endcode
-function _M.status()
+function _M.status(statusRoot)
     local board = {}
 
-    local root = Core.getRootPath()
+    local root = Core.getRootPath(statusRoot)
     if not root then
         return nil, "It's not a fácil board."
     end
