@@ -218,12 +218,13 @@ function _M.pathById(id)
 end
 
 --- Returns time of moving the task to exact board.
+-- @param root Root directory of (.fl)
 -- @param board Name of board.
 -- @param id Full task id.
 -- @return number - unix timestamp of the date when task was moved to selected board on success,
 --         nil, string - on error.
-function _M.movedAt(board, id)
-    local taskFileName = _M.path(_M.getRootPath(), "boards", board, id)
+function _M.movedAt(root, board, id)
+    local taskFileName = _M.path(_M.getRootPath(root), "boards", board, id)
     local taskFile, err = io.open(taskFileName, "r")
 
     if not taskFile then

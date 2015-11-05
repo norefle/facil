@@ -98,7 +98,7 @@ function _M.status(statusRoot)
                             id = taskId,
                             name = metadata.name,
                             created = tonumber(metadata.created),
-                            moved = Core.movedAt(laneName, taskId) or 0
+                            moved = Core.movedAt(root, laneName, taskId) or 0
                         }
                         lane.tasks[#lane.tasks + 1] = task
                     end
