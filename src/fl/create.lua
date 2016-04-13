@@ -14,7 +14,12 @@ local function create(name)
         return nil, "Error: name should be non empty to create card."
     end
 
-    return Fl.create(name)
+    local code, result = Fl.create(name)
+    if code then
+      result = "Created: " .. result
+    end
+
+    return code, result
 end
 
 --- Returns detailed description (string) help for create command.

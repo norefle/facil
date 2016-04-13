@@ -59,6 +59,8 @@ local function main(...)
                 print(description)
                 print("Use either fl help or fl --help for command and general help topics.")
                 return -1
+            elseif description then
+                print(description)
             end
         end
     end
