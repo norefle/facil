@@ -9,7 +9,7 @@
 -- @return true on success
 --         nil, error:string otherwise
 local function showHelp(topic, _, dictionary)
-    assert(nil ~= dictionary and "table" == type(dictionary))
+    assert(nil ~= dictionary and "table" == type(dictionary), "", 2)
 
     if not topic or "" == topic or "string" ~= type(topic) then
         print(dictionary.help())

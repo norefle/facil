@@ -16,8 +16,8 @@ Fl.version = require "fl.version"
 -- @param options Command line parser
 local function configureOptions(options)
     Options:set_name("fl")
-    Options:add_argument("COMMAND", "command to execute.")
-    Options:optarg("ARGS", "command dependent arguments.", "", 2)
+    Options:argument("COMMAND", "command to execute.")
+    Options:splat("ARGS", "command dependent arguments.", "", 2)
 end
 
 local Handlers = {}
@@ -40,24 +40,21 @@ Help.move = Fl.move.help
 -- @param ... command line arguments passed to cli application.
 local function main(...)
     configureOptions(Options)
-    local help = Options:print_help(true)
-    local usage = Options:print_usage(true)
 
-    local arguments = Options:parse_args()
+    local arguments = Options:parse()
 
     if arguments then
         if arguments["COMMAND"] then
             local command = arguments["COMMAND"]
             if not Handlers[command] then
-                Handlers.help(command, Help)
-                print("Invalid command: " .. command)
+                print("Invalid command: " .. command, "\n")
+                Handlers.help(Help.help, "", Help)
                 return
             end
             local code, description = Handlers[command](arguments.ARGS[1], arguments.ARGS[2], Help)
             if not code then
-                print(usage)
-                print(description)
-                print("Use either fl help or fl --help for command and general help topics.")
+                print(description, "\n")
+                Handlers.help(command, "", Help)
                 return -1
             elseif description then
                 print(description)
