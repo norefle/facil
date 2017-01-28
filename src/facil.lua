@@ -7,6 +7,7 @@ local Create = require "facil.create"
 local Init = require "facil.init"
 local Status = require "facil.status"
 local Move = require "facil.move"
+local Show = require "facil.show"
 
 local _M = { }
 
@@ -82,5 +83,7 @@ _M.status = Status.status
 
 ---
 _M.move = Move.move
+
+_M.show = Show.show
 
 return _M

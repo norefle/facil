@@ -30,6 +30,7 @@ List of commands:
     help [NAME]       Prints either common or detailed help for command 'name'.
     init ROOT         Initializes fácil within 'root' directory.
     move TASK [LANE]  Moves task further on board.
+    show TASK         Shows content of the selected task.
     status            Shows current status of board with tasks.
     version           Shows version and exits.]]
 end
